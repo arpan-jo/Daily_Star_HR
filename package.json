@@ -13,7 +13,7 @@
     "build:apk": "cd android && ./gradlew clean && ./gradlew assembleRelease && cd ..",
     "pod": "cd ios && pod install && cd .. ",
     "postinstall": "patch-package",
-    "setup-remotes": "git remote set-url --add --push origin https://github.com/arpan-jo/PeopleDesk_app.git && git remote set-url --add --push origin https://gitlab.ibos.io/apps/PeopleDesk_app.git"
+    "setup-remotes": "git remote set-url --add --push origin https://github.com/arpan-jo/Daily_Star_HR.git && git remote set-url --add --push origin https://gitlab.ibos.io/apps/Daily_Star_HR.git"
   },
   "dependencies": {
     "@dev-amirzubair/react-native-voice": "^1.0.4",
