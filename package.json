@@ -1,6 +1,6 @@
 {
-  "name": "PeopleDesk",
-  "version": "20.0.3",
+  "name": "DailyStar",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "android": "react-native run-android --active-arch-only",
