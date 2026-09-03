@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>66345309507-2ll88eup4nf5kc596lpatmkj5n47ss8a.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.66345309507-2ll88eup4nf5kc596lpatmkj5n47ss8a</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>66345309507-4jvdgv5nnt957f2hprcgc8p7e6r5pj8v.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCfm_6icYVVHEG9w7sQQ9wNG03JHXmKPco</string>
+	<key>GCM_SENDER_ID</key>
+	<string>66345309507</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>apptest.PeopleDesk</string>
+	<key>PROJECT_ID</key>
+	<string>peopledesk-4463d</string>
+	<key>STORAGE_BUCKET</key>
+	<string>peopledesk-4463d.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:66345309507:ios:ff16de75b5d0b656c74bf6</string>
+</dict>
+</plist>

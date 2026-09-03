@@ -1,0 +1,75 @@
+<!doctype html>
+<!--
+  Dev harness for the micro-app bridge. Not shipped, not bundled.
+
+  Serve it:   cd scratch/microapp-test && python3 -m http.server 8000
+  Then point a MICRO_APPS entry at http://<your-lan-ip>:8000 (debug builds
+  allow cleartext) and open it from the app.
+-->
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Micro-App Bridge Test</title>
+    <style>
+      body { font: 15px system-ui, sans-serif; margin: 0; padding: 16px; }
+      h1 { font-size: 17px; margin: 0 0 4px; }
+      p.sub { color: #666; margin: 0 0 16px; font-size: 13px; }
+      button { display: block; width: 100%; padding: 13px; margin-bottom: 8px;
+               font-size: 15px; border: 1px solid #ccc; border-radius: 8px;
+               background: #fff; }
+      button:active { background: #eee; }
+      #log { margin-top: 16px; padding: 12px; background: #111; color: #0f0;
+             font: 12px ui-monospace, monospace; border-radius: 8px;
+             white-space: pre-wrap; word-break: break-all; min-height: 120px; }
+    </style>
+  </head>
+  <body>
+    <h1>Micro-App Bridge Test</h1>
+    <p class="sub" id="status">waiting for bridge…</p>
+
+    <button onclick="run('toast', () => PeopleDesk.toast('hello from web', 'success'))">toast</button>
+    <button onclick="run('getUser', () => PeopleDesk.getUser())">getUser (must NOT contain a token)</button>
+    <button onclick="run('haptic', () => PeopleDesk.haptic())">haptic</button>
+    <button onclick="run('pickImage:camera', () => PeopleDesk.pickImage('camera'))">pickImage — camera</button>
+    <button onclick="run('pickImage:library', () => PeopleDesk.pickImage('library'))">pickImage — library</button>
+    <button onclick="run('pickFile', () => PeopleDesk.pickFile())">pickFile</button>
+    <button onclick="run('share', () => PeopleDesk.share({ title: 'Test', message: 'shared from a micro-app' }))">share</button>
+    <button onclick="run('download', () => PeopleDesk.download('https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', 'dummy.pdf'))">download</button>
+    <button onclick="run('navigate', () => PeopleDesk.navigate('AllApplicationFromDash'))">navigate</button>
+    <button onclick="run('close', () => PeopleDesk.close())">close (leaves this screen)</button>
+    <hr />
+    <button onclick="location.href='https://example.com'">off-host link (must open system browser)</button>
+
+    <div id="log"></div>
+
+    <script>
+      var logEl = document.getElementById('log');
+      function log(line) { logEl.textContent = line + '\n' + logEl.textContent; }
+
+      function run(name, fn) {
+        log('→ ' + name);
+        try {
+          Promise.resolve(fn()).then(
+            function (r) { log('← ' + name + ' ' + JSON.stringify(r)); },
+            function (e) { log('✗ ' + name + ' REJECTED ' + e); }
+          );
+        } catch (e) {
+          log('✗ ' + name + ' THREW ' + e);
+        }
+      }
+
+      window.addEventListener('peopledeskready', function () {
+        document.getElementById('status').textContent =
+          'bridge ready: ' + Object.keys(window.PeopleDesk).join(', ');
+      });
+
+      setTimeout(function () {
+        if (!window.PeopleDesk) {
+          document.getElementById('status').textContent =
+            'NO BRIDGE — injectedJavaScriptBeforeContentLoaded did not run';
+        }
+      }, 2000);
+    </script>
+  </body>
+</html>

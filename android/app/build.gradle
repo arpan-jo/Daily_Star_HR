@@ -1,0 +1,197 @@
+// Secrets live in .env (same file react-native-dotenv reads for the JS side) so they
+// are not hardcoded in Kotlin source. Keep .env out of version control.
+def envFile = rootProject.file("../.env")
+def envProps = new Properties()
+if (envFile.exists()) {
+    envFile.withInputStream { envProps.load(it) }
+}
+def envOrEmpty = { String key -> (envProps.getProperty(key) ?: "").trim() }
+
+// google-services.json is generated from the tracked template with FIREBASE_API_KEY
+// from .env, so the key is not committed. Regenerated on every configure.
+def gsTemplate = file("google-services.json.template")
+if (gsTemplate.exists()) {
+    def gsFile = file("google-services.json")
+    def generated = gsTemplate.text.replace('${FIREBASE_API_KEY}', envOrEmpty('FIREBASE_API_KEY'))
+    if (!gsFile.exists() || gsFile.text != generated) {
+        gsFile.text = generated
+    }
+}
+
+apply plugin: "com.android.application"
+apply plugin: "org.jetbrains.kotlin.android"
+apply plugin: "com.facebook.react"
+
+// added later
+apply plugin: 'com.google.gms.google-services' // <- Add this line
+apply plugin: 'com.google.firebase.crashlytics'
+
+/**
+ * This is the configuration block to customize your React Native Android app.
+ * By default you don't need to apply any configuration, just uncomment the lines you need.
+ */
+react {
+    /* Folders */
+    //   The root of your project, i.e. where "package.json" lives. Default is '../..'
+    // root = file("../../")
+    //   The folder where the react-native NPM package is. Default is ../../node_modules/react-native
+    // reactNativeDir = file("../../node_modules/react-native")
+    //   The folder where the react-native Codegen package is. Default is ../../node_modules/@react-native/codegen
+    // codegenDir = file("../../node_modules/@react-native/codegen")
+    //   The cli.js file which is the React Native CLI entrypoint. Default is ../../node_modules/react-native/cli.js
+    // cliFile = file("../../node_modules/react-native/cli.js")
+
+    /* Variants */
+    //   The list of variants to that are debuggable. For those we're going to
+    //   skip the bundling of the JS bundle and the assets. Default is "debug", "debugOptimized".
+    //   If you add flavors like lite, prod, etc. you'll have to list your debuggableVariants.
+    // debuggableVariants = ["liteDebug", "liteDebugOptimized", "prodDebug", "prodDebugOptimized"]
+
+    /* Bundling */
+    //   A list containing the node command and its flags. Default is just 'node'.
+    // nodeExecutableAndArgs = ["node"]
+    //
+    //   The command to run when bundling. By default is 'bundle'
+    // bundleCommand = "ram-bundle"
+    //
+    //   The path to the CLI configuration file. Default is empty.
+    // bundleConfig = file(../rn-cli.config.js)
+    //
+    //   The name of the generated asset file containing your JS bundle
+    // bundleAssetName = "MyApplication.android.bundle"
+    //
+    //   The entry file for bundle generation. Default is 'index.android.js' or 'index.js'
+    // entryFile = file("../js/MyApplication.android.js")
+    //
+    //   A list of extra flags to pass to the 'bundle' commands.
+    //   See https://github.com/react-native-community/cli/blob/main/docs/commands.md#bundle
+    // extraPackagerArgs = []
+
+    /* Hermes Commands */
+    //   The hermes compiler command to run. By default it is 'hermesc'
+    // hermesCommand = "$rootDir/my-custom-hermesc/bin/hermesc"
+    //
+    //   The list of flags to pass to the Hermes compiler. By default is "-O", "-output-source-map"
+    // hermesFlags = ["-O", "-output-source-map"]
+
+    /* Autolinking */
+    autolinkLibrariesWithApp()
+}
+
+/**
+ * Set this to true to Run Proguard on Release builds to minify the Java bytecode.
+ */
+def enableProguardInReleaseBuilds = true
+
+/**
+ * The preferred build flavor of JavaScriptCore (JSC)
+ *
+ * For example, to use the international variant, you can use:
+ * `def jscFlavor = io.github.react-native-community:jsc-android-intl:2026004.+`
+ *
+ * The international variant includes ICU i18n library and necessary data
+ * allowing to use e.g. `Date.toLocaleString` and `String.localeCompare` that
+ * give correct results when using with locales other than en-US. Note that
+ * this variant is about 6MiB larger per architecture than default.
+ */
+def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
+
+android {
+    ndkVersion rootProject.ext.ndkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+    compileSdk rootProject.ext.compileSdkVersion
+
+    namespace "com.peopledesk"
+
+    buildFeatures {
+        buildConfig = true
+    }
+
+    defaultConfig {
+        applicationId "com.peopledesk"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 443
+        versionName "20.0.3"
+
+        buildConfigField "String", "MQTT_SERVER_URI", "\"${envOrEmpty('mqttServerUri')}\""
+        buildConfigField "String", "MQTT_USERNAME", "\"${envOrEmpty('mqttUsername')}\""
+        buildConfigField "String", "MQTT_PASSWORD", "\"${envOrEmpty('mqttPassword')}\""
+
+        manifestPlaceholders = [MY_API_KEY: envOrEmpty('MAPS_API_KEY')]
+    }
+    signingConfigs {
+        release {
+            def storeFilePath = envOrEmpty('MYAPP_UPLOAD_STORE_FILE')
+            if (!storeFilePath.isEmpty()) {
+                storeFile file(storeFilePath)
+                storePassword envOrEmpty('MYAPP_UPLOAD_STORE_PASSWORD')
+                keyAlias envOrEmpty('MYAPP_UPLOAD_KEY_ALIAS')
+                keyPassword envOrEmpty('MYAPP_UPLOAD_KEY_PASSWORD')
+            }
+        }
+        debug {
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+    }
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+        }
+        release {
+            // Caution! In production, you need to generate your own keystore file.
+            // see https://reactnative.dev/docs/signed-apk-android.
+            // signingConfig signingConfigs.debug
+
+            signingConfig signingConfigs.release
+            minifyEnabled enableProguardInReleaseBuilds
+            shrinkResources true
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            // FULL native debug symbols add ~180MB of BUNDLE-METADATA to the .aab.
+            // SYMBOL_TABLE still symbolicates native crashes in Play Console.
+            ndk { debugSymbolLevel 'SYMBOL_TABLE' }
+        }
+    }
+}
+
+dependencies {
+    // The version of react-native is set by the React Native Gradle Plugin
+    implementation("com.facebook.react:react-android")
+
+    if (hermesEnabled.toBoolean()) {
+        implementation("com.facebook.react:hermes-android")
+    } else {
+        implementation jscFlavor
+    }
+
+    // for google-map
+    implementation project(':react-native-maps')
+
+    // Add the CallKeep library
+    // implementation project(':react-native-callkeep')
+
+    // Thermal Printer
+    implementation("com.github.DantSu:ESCPOS-ThermalPrinter-Android:3.3.0")
+    implementation("com.facebook.fresco:animated-gif:2.6.0")
+
+
+    //mqtt
+    implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+
+    // google fitness
+    implementation("com.google.android.gms:play-services-fitness:21.3.0")
+    implementation("androidx.work:work-runtime:2.7.1")
+//    implementation(project(":react-native-background-actions"))
+
+    // biometric
+    implementation("androidx.biometric:biometric:1.2.0-alpha05")
+
+    // LiveKit for audio calling
+    def livekit_version = "2.23.3"
+    implementation("io.livekit:livekit-android:$livekit_version")
+}
+apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")

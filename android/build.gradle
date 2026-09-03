@@ -1,0 +1,35 @@
+buildscript {
+    ext {
+        buildToolsVersion = "36.0.0"
+        minSdkVersion = 26
+        compileSdkVersion = 36
+        targetSdkVersion = 36
+        ndkVersion = "27.1.12297006"
+        kotlinVersion = "2.1.20"
+
+        // import for google-map
+        googlePlayServicesVersion = "21.0.1"
+        // use this version or newer
+        googlePlayServicesAuthVersion = "19.2.0" 
+
+    }
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath("com.android.tools.build:gradle")
+        classpath("com.facebook.react:react-native-gradle-plugin")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
+
+
+        classpath('com.google.gms:google-services:4.4.4')
+        // Uploads the Proguard mapping file on every release build so obfuscated
+        // stack traces are readable in the Crashlytics console. Native (NDK)
+        // symbol upload is a separate opt-in (`nativeSymbolUploadEnabled`) and is
+        // left off: release builds already ship SYMBOL_TABLE for Play Console.
+        classpath('com.google.firebase:firebase-crashlytics-gradle:3.0.8')
+    }
+}
+
+apply plugin: "com.facebook.react.rootproject"
