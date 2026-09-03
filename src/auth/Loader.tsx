@@ -76,7 +76,7 @@ const Loader = observer<RootStackScreenProps<'Loader'>>(
 
     return (
       <View style={styles.center}>
-        <FastImage style={styles.logo} source={IMAGES.animtaedLogo} />
+        <FastImage style={styles.logo} source={IMAGES.AppLogo} />
       </View>
     );
   },
