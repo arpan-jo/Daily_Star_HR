@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     marginTop: SIZES.height / 10,
   },
-  logo: { alignSelf: 'center', height: 87, width: 87 },
+  logo: { alignSelf: 'center', height: 120, width: 87 },
   appName: {
     color: COLORS.transparentDark,
     fontSize: 30,
