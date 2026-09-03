@@ -2,14 +2,9 @@ import * as Clarity from '@microsoft/react-native-clarity';
 import {
   arlURLL,
   commonURLL,
-  claudeKeyy,
   crmURLL,
-  deepseekKeyy,
   erpPeopleDeskURLL,
-  openaiKeyy,
   erpiBOSURLL,
-  linkedInClientIdd,
-  linkedInClientSecrett,
   mainURLL,
   openMapp,
   rscURLL,
@@ -89,12 +84,6 @@ export const openMap = openMapp;
 export const secretKey = secretKeyy;
 export const secureStorageKey = secureStorageKeyy;
 export const commonURL = commonURLL;
-export const linkedInClientId = linkedInClientIdd;
-export const linkedInClientSecret = linkedInClientSecrett;
-// Ship inside the bundle — extractable from the APK by anyone who has it.
-export const deepseekKey = deepseekKeyy;
-export const openaiKey = openaiKeyy;
-export const claudeKey = claudeKeyy;
 
 const linking: LinkingOptions<any> = {
   prefixes: [

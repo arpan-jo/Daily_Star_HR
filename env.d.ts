@@ -11,6 +11,4 @@ declare module '@env' {
   export const commonURLL: string;
 
   export const googleWebClientIdd: string;
-  export const linkedInClientIdd: string;
-  export const linkedInClientSecrett: string;
 }
