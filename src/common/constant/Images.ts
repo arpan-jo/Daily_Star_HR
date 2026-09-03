@@ -1,5 +1,5 @@
 const NoImage = require('../../assets/no-image/userNoImage.png');
-const AppLogo = require('../../assets/app_logo/people-desk-logo.png');
+const AppLogo = require('../../assets/app_logo/daily-star-logo.png');
 const AppLogoWithName = require('../../assets/app_logo/logoWithName.png');
 const Medical = require('../../assets/medical/certificate.png');
 const NoDataImage = require('../../assets/no-image/nodata.png');
