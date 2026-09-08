@@ -413,12 +413,7 @@ const EmpolyeeSkills = lazy(
       '../modules/SaaS-modules/dashboard/employeeDashboard/EmpolyeeSkills'
     ),
 );
-const EsgManagement = lazy(
-  () =>
-    import(
-      '../modules/SaaS-modules/dashboard/employeeDashboard/ESG-management/EsgManagement'
-    ),
-);
+
 const InternalReferenceLanding = lazy(
   () =>
     import(
@@ -840,7 +835,6 @@ export const saasModuleStack = [
   { name: 'EmployeeAddLink', component: EmployeeAddLink },
   { name: 'EmpolyeeSelfDetails', component: EmpolyeeSelfDetails },
   { name: 'EmpolyeeSkills', component: EmpolyeeSkills },
-  { name: 'EsgManagement', component: EsgManagement },
   { name: 'InternalReferenceLanding', component: InternalReferenceLanding },
   { name: 'MakeCustomerIR', component: MakeCustomerIR },
   { name: 'JobDescriptionDetails', component: JobDescriptionDetails },
