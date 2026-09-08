@@ -156,7 +156,6 @@ export type RootStackScreensParams = {
   PDFViewer: any;
   WifiZoneMainIndex: any;
   PerformanceManagementIndexNew: any;
-  EsgManagement: any;
   IhApprovalLanding: any;
   ShareExchangeMainIndex: any;
   AllShareDeskSeats: any;
