@@ -497,12 +497,6 @@ const PayslipDetails = lazy(
       '../modules/SaaS-modules/dashboard/employeeDashboard/PayslipDetails'
     ),
 );
-const PayslipDetailsArl = lazy(
-  () =>
-    import(
-      '../modules/SaaS-modules/dashboard/employeeDashboard/PaySlipDetailsARL'
-    ),
-);
 
 const EmployeeSalary = lazy(
   () =>
@@ -861,7 +855,6 @@ export const saasModuleStack = [
   { name: 'WorkflowBusinessTaskIndex', component: WorkflowBusinessTaskIndex },
   { name: 'NoticeDetails', component: NoticeDetails },
   { name: 'PayslipDetails', component: PayslipDetails },
-  { name: 'PayslipDetailsArl', component: PayslipDetailsArl },
 
   { name: 'PerformanceEntry', component: PerformanceEntry },
   { name: 'EmployeeSalary', component: EmployeeSalary },

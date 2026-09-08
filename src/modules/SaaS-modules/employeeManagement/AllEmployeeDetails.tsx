@@ -745,7 +745,7 @@ const AllEmployeeDetails = ({route}: props) => {
           <View style={styles.viewPayslip}>
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate('PayslipDetailsArl', {empId});
+                navigation.navigate('PayslipDetails', {empId});
               }}
               style={{flexDirection: 'row', alignItems: 'center'}}>
               <Text style={styles.remotePunch}>View Payslip</Text>

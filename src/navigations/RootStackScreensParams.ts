@@ -157,7 +157,6 @@ export type RootStackScreensParams = {
   WifiZoneMainIndex: any;
   PerformanceManagementIndexNew: any;
   EsgManagement: any;
-  PayslipDetailsArl: any;
   IhApprovalLanding: any;
   ShareExchangeMainIndex: any;
   AllShareDeskSeats: any;

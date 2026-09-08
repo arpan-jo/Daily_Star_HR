@@ -1072,11 +1072,7 @@ const HomeMainIndex = () => {
                 style={[styles.viewPayslip, { borderColor: COLORS.primary }]}
               >
                 <TouchableOpacity
-                  onPress={() => {
-                    userInfo?.strUrl === arlURL
-                      ? navigation.navigate('PayslipDetailsArl')
-                      : navigation.navigate('PayslipDetails');
-                  }}
+                  onPress={() => navigation.navigate('PayslipDetails')}
                   style={styles.rowCenter}
                 >
                   <Text style={[styles.remotePunch, { color: COLORS.primary }]}>
