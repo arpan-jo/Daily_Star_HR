@@ -1,574 +1,262 @@
-import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import axios from 'axios';
 import dayjs from 'dayjs';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import {
-  FlatList,
-  Modal,
-  Platform,
-  ScrollView,
+  ActivityIndicator,
   StyleSheet,
   Text,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { Edge } from 'react-native-safe-area-context';
 import MIcons from 'react-native-vector-icons/MaterialIcons';
-// import RNFetchBlob from 'rn-fetch-blob';
-import CustomButtonNew from '../../../../common/components/CustomButton';
+import WebView from 'react-native-webview';
+import Column from '../../../../common/components/Column';
 import ContainerNew from '../../../../common/components/Container';
+import CustomDropDownNew from '../../../../common/components/CustomDropDown';
 import CustomHeader from '../../../../common/components/CustomHeader';
+import Row from '../../../../common/components/Row';
 import { IMAGES } from '../../../../common/constant/Index';
 import { COLORS } from '../../../../common/constant/Themes';
-import {
-  PalyslipLandingType,
-  SalaryCodeDataType,
-  PalyslipHeadDataType,
-} from '../../../../interfaces/dashboard/employeeDashboard';
-import {
-  getSalaryCode,
-  getSalaryPaySlip,
-  getSalaryPaySlipBonux,
-} from '../../../../services/SaaS-modules/dashboard/employeeDashboard';
-import { useRootStore } from '../../../../stores/rootStore';
 import useAsyncEffect from '../../../../common/packages/useAsyncEffect/useAsyncEffect';
-
-import { numberWithCommas } from '../../../../common/constant/numberWithComma';
-import { fileService } from '../../../../services/file.service';
-import { useToast } from '../../../../common/components/CustomToast';
+import { getEmployeeSalaryPayslipHtml } from '../../../../services/SaaS-modules/dashboard/employeeDashboard';
+import { useRootStore } from '../../../../stores/rootStore';
 
 const edges: Edge[] = ['right', 'bottom', 'left'];
 
-const monthDDL = [
-  {
-    value: 1,
-    label: 'January',
-  },
-  {
-    value: 2,
-    label: 'February',
-  },
-  {
-    value: 3,
-    label: 'March',
-  },
-  {
-    value: 4,
-    label: 'April',
-  },
-  {
-    value: 5,
-    label: 'May',
-  },
-  {
-    value: 6,
-    label: 'June',
-  },
-  {
-    value: 7,
-    label: 'July',
-  },
-  {
-    value: 8,
-    label: 'August',
-  },
-  {
-    value: 9,
-    label: 'September',
-  },
-  {
-    value: 10,
-    label: 'October',
-  },
-  {
-    value: 11,
-    label: 'November',
-  },
-  {
-    value: 12,
-    label: 'December',
-  },
+type Option = { value: number; label: string };
+type PayslipForm = { year: Option; month: Option };
+type PayslipRouteParams = { empId?: number } | undefined;
+
+const monthDDL: Option[] = [
+  { value: 1, label: 'January' },
+  { value: 2, label: 'February' },
+  { value: 3, label: 'March' },
+  { value: 4, label: 'April' },
+  { value: 5, label: 'May' },
+  { value: 6, label: 'June' },
+  { value: 7, label: 'July' },
+  { value: 8, label: 'August' },
+  { value: 9, label: 'September' },
+  { value: 10, label: 'October' },
+  { value: 11, label: 'November' },
+  { value: 12, label: 'December' },
 ];
 
+const YEARS_BACK = 2;
+
+/**
+ * The server renders the payslip for a desktop page width. Inject a viewport
+ * and a tiny script that zooms the body down so the whole slip fits the phone
+ * width; pinch-zoom stays available for reading the small print.
+ */
+const buildPayslipDocument = (html: string): string => {
+  const head =
+    '<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes" />' +
+    '<style>html,body{margin:0;padding:0;background:#fff;}body{padding:8px;-webkit-text-size-adjust:100%;}</style>';
+  const script =
+    '<script>(function(){function fit(){var b=document.body;if(!b){return;}' +
+    "b.style.zoom='1';var w=Math.max(document.documentElement.scrollWidth,b.scrollWidth);" +
+    'var vw=window.innerWidth;if(w>vw){b.style.zoom=String(vw/w);}}' +
+    "window.addEventListener('load',fit);window.addEventListener('resize',fit);fit();})();</script>";
+
+  const withHead = /<head[^>]*>/i.test(html)
+    ? html.replace(/<head[^>]*>/i, match => `${match}${head}`)
+    : `<!DOCTYPE html><html><head>${head}</head><body>${html}</body></html>`;
+
+  return /<\/body>/i.test(withHead)
+    ? withHead.replace(/<\/body>/i, `${script}</body>`)
+    : `${withHead}${script}`;
+};
+
 const PayslipDetails = () => {
-  const currentMonth = dayjs().month() - 1;
-  const currentYear = dayjs().year();
-  //  const monthId = currentMonth + 1;
-  const yearId = currentYear;
-  const [isModalShow, setIsModalShow] = useState(false);
   const navigation = useNavigation();
+  const route = useRoute();
   const { userInfo } = useRootStore();
-  const isFocused = useIsFocused();
-  const [paySlipData, setPaySlipData] = useState<PalyslipLandingType[]>();
-  const [month, setMonth] = useState({
-    value: monthDDL?.[currentMonth]?.value,
-    label: monthDDL?.[currentMonth]?.label,
+
+  const routeEmpId = (route.params as PayslipRouteParams)?.empId;
+  const empId = routeEmpId || userInfo?.intEmployeeId;
+
+  const currentYear = dayjs().year();
+  const currentMonthNumber = dayjs().month() + 1;
+
+  const yearDDL = useMemo<Option[]>(
+    () =>
+      Array.from({ length: YEARS_BACK + 1 }, (_, i) => {
+        const year = currentYear - YEARS_BACK + i;
+        return { value: year, label: String(year) };
+      }),
+    [currentYear],
+  );
+
+  const { control, setValue, watch } = useForm<PayslipForm>({
+    defaultValues: {
+      year: { value: currentYear, label: String(currentYear) },
+      month: monthDDL[currentMonthNumber - 1],
+    },
   });
-  const [salaryCode, setSalaryCode] = useState<SalaryCodeDataType[]>();
-  const [payHeadData, setPayHeadData] = useState<PalyslipHeadDataType[]>();
-  const [salaryIndex, setSalaryIndex] = useState(0);
+  const year = watch('year');
+  const month = watch('month');
 
-  const empId = userInfo?.intEmployeeId;
-  const toaster = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  const [payslipHtml, setPayslipHtml] = useState('');
 
   useAsyncEffect(
     async isMounted => {
-      if (!isMounted()) {
-        return null;
+      if (!empId || !month?.value || !year?.value) {
+        return;
       }
-      const salCode = await getSalaryCode(
-        userInfo?.intAccountId,
-        userInfo?.intBusinessUnitId,
-        userInfo?.intWorkplaceGroupId,
-        userInfo?.intEmployeeId,
-        month?.value,
-        yearId,
+      setIsLoading(true);
+      setPayslipHtml('');
+      const html = await getEmployeeSalaryPayslipHtml(
+        empId,
+        month.value,
+        year.value,
       );
-      setSalaryCode(salCode);
-      if (salCode?.[0]?.SalaryGenerateRequestId) {
-        const data = await getSalaryPaySlip(
-          empId,
-          month?.value,
-          yearId,
-          salCode?.[0]?.SalaryGenerateRequestId,
-          userInfo?.intBusinessUnitId,
-          userInfo?.intWorkplaceGroupId,
-        );
-        setPaySlipData(data);
-        const res = await getSalaryPaySlipBonux(
-          empId,
-          month?.value,
-          yearId,
-          salCode?.[0]?.SalaryGenerateRequestId,
-          userInfo?.intBusinessUnitId,
-          userInfo?.intWorkplaceGroupId,
-        );
-        setPayHeadData(res);
-      }
-    },
-    [isFocused, month],
-  );
-
-  useAsyncEffect(
-    async isMounted => {
       if (!isMounted()) {
-        return null;
+        return;
       }
-      if (salaryCode?.[salaryIndex]?.SalaryGenerateRequestId) {
-        const data = await getSalaryPaySlip(
-          empId,
-          month?.value,
-          yearId,
-          salaryCode?.[salaryIndex]?.SalaryGenerateRequestId,
-          userInfo?.intBusinessUnitId,
-          userInfo?.intWorkplaceGroupId,
-        );
-
-        setPaySlipData(data);
-        const res = await getSalaryPaySlipBonux(
-          empId,
-          month?.value,
-          yearId,
-          salaryCode?.[salaryIndex]?.SalaryGenerateRequestId,
-          userInfo?.intBusinessUnitId,
-          userInfo?.intWorkplaceGroupId,
-        );
-        setPayHeadData(res);
-      }
+      setPayslipHtml(html);
+      setIsLoading(false);
     },
-    [salaryIndex],
+    [empId, month?.value, year?.value],
   );
 
-  const downloadFile = async () => {
-    const paySlipUrl = `${axios.defaults.baseURL}/PdfAndExcelReport/EmployeePaySlipReport?partName=SalaryGenerateHeaderByPayrollMonthNEmployeeId&intEmployeeId=${userInfo?.intEmployeeId}&intMonthId=${month?.value}&intSalaryGenerateRequestId=${salaryCode?.[salaryIndex]?.SalaryGenerateRequestId}&intYearId=${yearId}&isDownload=true`;
-
-    const response = await fileService.FileDownload({
-      fullUrl: paySlipUrl,
-      fileName: `Payslip ${month?.label}`,
-      token: userInfo?.token!,
-    });
-    toaster.show({
-      message: response?.message,
-      type: response?.status ? 'success' : 'error',
-    });
-
-    // const { config, fs, ios } = RNFetchBlob;
-
-    // let PictureDir =
-    //   Platform.OS === 'ios' ? fs.dirs.DocumentDir : fs.dirs.DownloadDir;
-
-    // // Construct file name
-    // let fileName = `${payHeadData?.[0]?.strEmployeeCode || ''}_${month?.label}_${currentYear}_payslip.pdf`;
-    // let filePath = `${PictureDir}/${fileName}`;
-
-    // let options = {
-    //   indicator: true,
-    //   fileCache: true,
-    //   appendExt: '.pdf',
-    //   addAndroidDownloads: {
-    //     useDownloadManager: true,
-    //     notification: true,
-    //     path: filePath,
-    //     description: 'document',
-    //   },
-    //   path: filePath,
-    // };
-
-    // config(options)
-    //   .fetch('GET', image_URL, {
-    //     Authorization: `Bearer ${userInfo?.token}`,
-    //   })
-    //   .then(res => {
-    //     if (res?.data && Platform.OS === 'android') {
-    //       Alert.alert('', 'Your payslip download complete', [
-    //         { text: 'OK', onPress: () => console.log('OK Pressed') },
-    //       ]);
-    //     }
-    //     if (res?.data && Platform.OS === 'ios') {
-    //       fs.writeFile(filePath, res.data, 'base64')
-    //         .then(() => {
-    //           // Preview the document
-    //           ios.previewDocument(res.data);
-    //         })
-    //         .catch(err => {
-    //           console.error('File write error:', err);
-    //         });
-    //     }
-    //   });
-  };
+  const isEarliest =
+    year?.value === yearDDL[0]?.value && month?.value === 1;
+  const isLatest =
+    year?.value > currentYear ||
+    (year?.value === currentYear && month?.value >= currentMonthNumber);
 
   const previousMonth = () => {
-    setMonth({
-      value: month?.value - 1,
-      label: monthDDL[month?.value - 2]?.label,
-    });
+    if (month?.value === 1) {
+      setValue('month', monthDDL[11]);
+      setValue('year', {
+        value: year.value - 1,
+        label: String(year.value - 1),
+      });
+    } else {
+      setValue('month', monthDDL[month.value - 2]);
+    }
   };
 
   const nextMonth = () => {
-    setMonth({ value: month?.value + 1, label: monthDDL[month?.value]?.label });
-  };
-
-  const benefits =
-    paySlipData &&
-    paySlipData?.length > 0 &&
-    paySlipData?.filter(item => item?.intPayrollElementTypeId);
-
-  const deduction =
-    paySlipData?.length &&
-    paySlipData?.filter(item => !item?.intPayrollElementTypeId);
-  const tax = payHeadData?.[0]?.numTaxAmount || 0;
-  const pf = payHeadData?.[0]?.numPFAmount || 0;
-  const loan = payHeadData?.[0]?.numLoanAmount || 0;
-  // const overtime = payHeadData?.[0]?.numOverTimeAmount || 0;ss
-
-  const absentAmount =
-    (payHeadData?.[0]?.intAbsent || 0) *
-    (payHeadData?.[0]?.numPerDaySalary || 0);
-
-  const totalBen =
-    benefits &&
-    benefits?.length &&
-    benefits?.map(item => item?.numAmount)?.reduce?.((p, c) => p + c);
-  // const totalBenefits = overtime + (totalBen || 0);
-  const totalBenefits = totalBen || 0;
-  const totalDeduc =
-    deduction &&
-    deduction?.length &&
-    deduction?.map(item => item?.numAmount)?.reduce?.((p, c) => p + c);
-
-  const totalDeducton = tax + loan + pf + (totalDeduc || 0);
-
-  const getNetpay = (benfit: number | undefined, deduct = 0) => {
-    if (benfit) {
-      const deductAmmount =
-        userInfo?.intBusinessUnitId === 1 ? deduct + absentAmount : deduct;
-      const netPay = benfit - deductAmmount;
-      const finalAmount = Math.round(netPay);
-      return numberWithCommas(finalAmount);
-    }
-  };
-
-  const handleSalaryCode = (index: number) => {
-    if (salaryCode) {
-      const copyData = [...salaryCode];
-      const modifyData = copyData?.map((item, i) => {
-        return {
-          ...item,
-          isActive: i === index ? true : false,
-        };
+    if (month?.value === 12) {
+      setValue('month', monthDDL[0]);
+      setValue('year', {
+        value: year.value + 1,
+        label: String(year.value + 1),
       });
-      setSalaryIndex(index);
-      setSalaryCode(modifyData);
+    } else {
+      setValue('month', monthDDL[month.value]);
     }
   };
+
+  // Relative assets (e.g. logo) in the report resolve against the API origin.
+  const baseUrl = useMemo(() => {
+    const match = /^(https?:\/\/[^/]+)/i.exec(axios.defaults.baseURL || '');
+    return match?.[1] || undefined;
+  }, []);
+
+  const document = useMemo(
+    () => (payslipHtml ? buildPayslipDocument(payslipHtml) : ''),
+    [payslipHtml],
+  );
 
   return (
     <ContainerNew
       edges={edges}
+      isRefresh={false}
       isScrollView={false}
       header={
         <CustomHeader
           headerColor={true}
           onBackPress={navigation?.goBack}
           title="Pay Slip"
-          alterIcon="today"
-          alterIconPress={() => setIsModalShow(true)}
         />
       }
       style={styles.container}
     >
-      {salaryCode && salaryCode?.length > 1 ? (
-        <ScrollView
-          horizontal={true}
-          showsHorizontalScrollIndicator={false}
-          style={styles.salaryCodeContainer}
+      <Row rowStyle={styles.filterRow}>
+        <Column colWidth={'48%'}>
+          <CustomDropDownNew
+            control={control}
+            label="Year"
+            name="year"
+            data={yearDDL}
+            onChange={(opt: Option) => setValue('year', opt)}
+            placholder="Select Year"
+          />
+        </Column>
+        <Column colWidth={'48%'} colStyle={styles.colGap}>
+          <CustomDropDownNew
+            control={control}
+            label="Month"
+            name="month"
+            data={monthDDL}
+            onChange={(opt: Option) => setValue('month', opt)}
+            placholder="Select Month"
+          />
+        </Column>
+      </Row>
+
+      <View style={styles.monthNav}>
+        <TouchableOpacity
+          disabled={isEarliest}
+          onPress={previousMonth}
+          style={[styles.navBtn, isEarliest && styles.navBtnDisabled]}
         >
-          <View style={styles.flexRowCenter}>
-            {salaryCode?.map((item, index) => (
-              <CustomButtonNew
-                disabled={item?.isActive ? true : false}
-                key={index}
-                btnText={item?.SalaryCode}
-                onBtnPress={() => handleSalaryCode(index)}
-                btnstyle={[item?.isActive ? styles.activeBtn : styles.btn1]}
-                btnTextStyle={styles.btnText1}
-              />
-            ))}
-          </View>
-        </ScrollView>
-      ) : null}
-      {salaryCode && salaryCode?.length > 0 ? (
-        <>
-          <ScrollView showsVerticalScrollIndicator={false}>
-            <View style={styles.padding}>
-              <View style={styles.box}>
-                <View style={styles.width48}>
-                  <Text style={styles.txtHeading}>Salary Month</Text>
-                  <Text style={styles.txtMain}>
-                    {month?.label}, {currentYear}
-                  </Text>
-                </View>
-                <View style={styles.width48}>
-                  <Text style={styles.txtHeading}>Pay Mode</Text>
-                  <Text style={styles.txtMain}>
-                    {payHeadData?.[0]?.strPaymentBankType}
-                  </Text>
-                </View>
-              </View>
-              <View style={styles.box}>
-                <View style={styles.width48}>
-                  <Text style={styles.txtHeading}>Net Pay</Text>
-                  <Text style={styles.txtMain}>
-                    {getNetpay(totalBenefits, totalDeducton)}
-                  </Text>
-                </View>
-              </View>
+          <MIcons name="arrow-back-ios" size={18} color={COLORS.iconColor} />
+        </TouchableOpacity>
+        <Text style={styles.monthLabel}>
+          {month?.label}, {year?.label}
+        </Text>
+        <TouchableOpacity
+          disabled={isLatest}
+          onPress={nextMonth}
+          style={[styles.navBtn, isLatest && styles.navBtnDisabled]}
+        >
+          <MIcons
+            name="arrow-forward-ios"
+            size={18}
+            color={COLORS.iconColor}
+          />
+        </TouchableOpacity>
+      </View>
+
+      {isLoading ? (
+        <View style={styles.loader}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+        </View>
+      ) : document ? (
+        <WebView
+          key={`${empId}-${year?.value}-${month?.value}`}
+          originWhitelist={['*']}
+          source={{ html: document, baseUrl }}
+          style={styles.webview}
+          startInLoadingState={true}
+          nestedScrollEnabled
+          setSupportMultipleWindows={false}
+          renderLoading={() => (
+            <View style={styles.loader}>
+              <ActivityIndicator size="large" color={COLORS.primary} />
             </View>
-
-            <View>
-              <View style={styles.padding}>
-                <Text style={styles.headerTxt}>Additions</Text>
-
-                {benefits && benefits?.length > 0 ? (
-                  benefits?.map((item, index) => (
-                    <View key={index} style={styles.rowSpaceBetween}>
-                      <Text style={styles.txtList}>
-                        {item?.strPayrollElement || 'N/A'}
-                      </Text>
-                      <Text style={styles.txtList}>
-                        {numberWithCommas(item?.numAmount) || 'N/A'}
-                      </Text>
-                    </View>
-                  ))
-                ) : (
-                  <></>
-                )}
-                {/* <View style={styles.rowSpaceBetween}>
-                  <Text style={styles.txtList}>Overtime</Text>
-                  <Text style={styles.txtList}>{overtime || 0}</Text>
-                </View> */}
-
-                <View style={styles.divider} />
-
-                <View style={styles.rowSpaceBetween}>
-                  <Text style={styles.txtList}>Total Benefits</Text>
-                  <Text style={styles.txtList}>
-                    {totalBenefits
-                      ? numberWithCommas(Math.round(totalBenefits))
-                      : 0}
-                  </Text>
-                </View>
-                <View style={styles.divider} />
-              </View>
-
-              <Text style={[styles.headerTxt, styles.padHorizon]}>
-                Deductions
-              </Text>
-
-              <View style={styles.padHorizon}>
-                <View>
-                  {deduction && deduction?.length > 0 ? (
-                    deduction?.map((item, index) => (
-                      <View key={index} style={styles.rowSpaceBetween}>
-                        <Text style={styles.txtList}>
-                          {item?.strPayrollElement}
-                        </Text>
-                        <Text style={styles.txtList}>
-                          {numberWithCommas(item?.numAmount)}
-                        </Text>
-                      </View>
-                    ))
-                  ) : (
-                    <></>
-                  )}
-
-                  <View style={styles.rowSpaceBetween}>
-                    <Text style={styles.txtList}>Tax</Text>
-                    <Text style={styles.txtList}>{tax || 0}</Text>
-                  </View>
-
-                  <View style={styles.rowSpaceBetween}>
-                    <Text style={styles.txtList}>Loan</Text>
-                    <Text style={styles.txtList}>{loan || 0}</Text>
-                  </View>
-                  <View style={styles.rowSpaceBetween}>
-                    <Text style={styles.txtList}>Provident Fund</Text>
-                    <Text style={styles.txtList}>{pf || 0}</Text>
-                  </View>
-
-                  <View style={styles.divider} />
-                  <View style={styles.rowSpaceBetween}>
-                    <Text style={styles.txtList}>Total Deductions</Text>
-                    <Text style={styles.txtList}>
-                      {totalDeducton ? numberWithCommas(totalDeducton) : 0}
-                    </Text>
-                  </View>
-                  <View style={styles.divider} />
-                </View>
-              </View>
-
-              <View style={styles.padding}>
-                <View style={styles.rowSpaceBetween}>
-                  <Text style={styles.headerTxt}>Net Pay</Text>
-                  <Text style={styles.headerTxt}>
-                    {getNetpay(totalBenefits, totalDeducton)}
-                  </Text>
-                </View>
-              </View>
-
-              <View style={styles.buttonSection}>
-                <TouchableOpacity
-                  disabled={month?.value === 1}
-                  style={styles.alignCenter}
-                  onPress={() => previousMonth()}
-                >
-                  <MIcons
-                    name="arrow-back-ios"
-                    size={20}
-                    color={COLORS.iconColor}
-                  />
-                </TouchableOpacity>
-
-                <CustomButtonNew
-                  bgColor={'#F2F4F7'}
-                  btnText={'Download Payslip'}
-                  onBtnPress={() => downloadFile()}
-                  btnstyle={styles.btn}
-                  btnTextStyle={styles.btnText}
-                />
-                <TouchableOpacity
-                  disabled={month?.value === currentMonth + 1}
-                  style={styles.alignCenter}
-                  onPress={() => nextMonth()}
-                >
-                  <MIcons
-                    name="arrow-forward-ios"
-                    size={20}
-                    color={COLORS.iconColor}
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            <View style={styles.paddingBottom} />
-          </ScrollView>
-        </>
+          )}
+        />
       ) : (
         <View style={styles.noDataSec}>
           <FastImage source={IMAGES.NoDataImage} style={styles.noDataImg} />
           <Text style={styles.noDataText}>
             No Payslip found in{' '}
             <Text style={styles.noDataMonth}>
-              {month?.label}, {currentYear}
+              {month?.label}, {year?.label}
             </Text>
           </Text>
         </View>
       )}
-      <Modal visible={isModalShow} transparent={true} animationType="fade">
-        <TouchableWithoutFeedback onPress={() => setIsModalShow(!isModalShow)}>
-          <View style={styles.modalWrapper}>
-            <TouchableWithoutFeedback>
-              <View style={styles.modal}>
-                {monthDDL?.length === 0 && (
-                  <View style={styles.noData}>
-                    <Text style={[styles.noItem]}>No Data Found</Text>
-                  </View>
-                )}
-                <FlatList
-                  data={monthDDL}
-                  renderItem={({ item }) => (
-                    <TouchableOpacity
-                      onPress={async () => {
-                        setIsModalShow(false);
-                        setMonth(item);
-
-                        const salCode = await getSalaryCode(
-                          userInfo?.intAccountId,
-                          userInfo?.intBusinessUnitId,
-                          userInfo?.intWorkplaceGroupId,
-                          userInfo?.intEmployeeId,
-                          item?.value,
-                          yearId,
-                        );
-                        setSalaryCode(salCode);
-
-                        const data = await getSalaryPaySlip(
-                          empId,
-                          item?.value,
-                          yearId,
-                          salCode?.[0]?.SalaryGenerateRequestId,
-                          userInfo?.intBusinessUnitId,
-                          userInfo?.intWorkplaceGroupId,
-                        );
-                        setPaySlipData(data);
-
-                        const res = await getSalaryPaySlipBonux(
-                          empId,
-                          item?.value,
-                          yearId,
-                          salCode?.[0]?.SalaryGenerateRequestId,
-                          userInfo?.intBusinessUnitId,
-                          userInfo?.intWorkplaceGroupId,
-                        );
-                        setPayHeadData(res);
-                      }}
-                    >
-                      <View>
-                        <Text style={[styles.item]}>{item?.label}</Text>
-                        <View style={styles.itemListWrapper} />
-                      </View>
-                    </TouchableOpacity>
-                  )}
-                  //@ts-ignore
-                  keyExtractor={(item, index) => index}
-                />
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
     </ContainerNew>
   );
 };
@@ -577,114 +265,60 @@ export default PayslipDetails;
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    paddingHorizontal: 0,
     backgroundColor: COLORS.white,
   },
-  box: {
+  filterRow: {
+    paddingHorizontal: 16,
+    marginTop: 8,
+  },
+  colGap: {
+    marginLeft: 8,
+  },
+  monthNav: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignContent: 'flex-start',
-    marginBottom: 8,
-  },
-  txtHeading: {
-    lineHeight: 18,
-    fontSize: 12,
-    fontWeight: '400',
-    color: COLORS.graySubText,
-  },
-  txtMain: {
-    lineHeight: 20,
-    fontSize: 14,
-    fontWeight: '500',
-    color: COLORS.textNewColor,
-  },
-  width48: {
-    width: '48%',
-  },
-  headerTxt: {
-    lineHeight: 24,
-    fontSize: 16,
-    marginBottom: 16,
-    paddingRight: 12,
-    fontWeight: '600',
-    color: COLORS.textNewColor,
-  },
-  rowSpaceBetween: {
-    flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
-  divider: {
-    borderBottomWidth: 1,
-    flex: 1,
-    borderBottomColor: COLORS.offDay,
-    marginBottom: 8,
+  navBtn: {
+    padding: 6,
   },
-  txtList: {
-    lineHeight: 20,
-    fontSize: 14,
-    fontWeight: '400',
-    color: COLORS.textNewColor,
-    marginBottom: 8,
-    paddingRight: 12,
+  navBtnDisabled: {
+    opacity: 0.3,
   },
-
-  btn: {
-    alignSelf: 'center',
-    borderColor: COLORS.primary,
-    borderWidth: 1,
-    borderRadius: 100,
-    paddingHorizontal: 24,
-    paddingVertical: 10,
-  },
-  btnText: {
+  monthLabel: {
     fontSize: 14,
     fontWeight: '600',
     lineHeight: 20,
-    color: COLORS.primary,
+    color: COLORS.textNewColor,
   },
-
-  modalWrapper: {
+  webview: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    width: '100%',
+    backgroundColor: COLORS.white,
+  },
+  loader: {
+    flex: 1,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  modal: {
-    paddingHorizontal: 15,
-    paddingVertical: 20,
-    width: '90%',
-    height: Platform.OS === 'ios' ? '90%' : '80%',
-    backgroundColor: 'white',
-    borderRadius: 10,
-    overflow: 'hidden',
+    backgroundColor: COLORS.white,
   },
   noDataSec: {
-    height: '100%',
+    flex: 1,
     paddingTop: 50,
     alignItems: 'center',
   },
-  noData: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  noItem: {
-    paddingVertical: 15,
-    fontSize: 17,
-  },
-  item: {
-    fontSize: 17,
-    color: COLORS.blackish,
-    paddingTop: 15,
-  },
-  itemListWrapper: {
-    borderTopWidth: 1,
-    borderColor: '#E4E9F2',
-    marginTop: 8,
-  },
-  padding: {
-    padding: 16,
-  },
-  padHorizon: {
-    paddingHorizontal: 16,
+  noDataImg: {
+    width: 130,
+    height: 90,
   },
   noDataText: {
     textAlign: 'center',
@@ -692,62 +326,8 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     fontSize: 14,
   },
-  noDataImg: {
-    width: 130,
-    height: 90,
-  },
-  alignCenter: {
-    alignSelf: 'center',
-  },
-  buttonSection: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginHorizontal: 24,
-    marginTop: 24,
-    marginBottom: 40,
-  },
-  flexRowCenter: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  btn1: {
-    alignSelf: 'center',
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 6,
-    marginRight: 8,
-    borderWidth: 1,
-    backgroundColor: COLORS.newGray,
-    borderColor: COLORS.offDay,
-  },
-  btnText1: {
-    fontSize: 14,
-    fontWeight: '500',
-    lineHeight: 20,
-    color: '#344054',
-  },
-  salaryCodeContainer: {
-    backgroundColor: '#1F843C',
-    height: 75,
-    paddingTop: 5,
-  },
-  paddingBottom: {
-    paddingBottom: 200,
-  },
   noDataMonth: {
     fontSize: 14,
     fontWeight: '600',
-  },
-  activeBtn: {
-    alignSelf: 'center',
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 6,
-    marginRight: 8,
-    borderWidth: 1,
-    borderColor: COLORS.offDay,
-    backgroundColor: COLORS.lightPrimary2,
   },
 });

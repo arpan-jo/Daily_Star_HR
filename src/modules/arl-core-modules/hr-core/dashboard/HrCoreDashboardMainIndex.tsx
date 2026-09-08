@@ -1714,11 +1714,7 @@ const HrCoreDashboardMainIndex = () => {
                   <Text style={styles.attendance}>My Payslip</Text>
                   <View style={styles.viewPayslip}>
                     <TouchableOpacity
-                      onPress={() => {
-                        userInfo?.strUrl === arlURL
-                          ? navigation.navigate('PayslipDetailsArl')
-                          : navigation.navigate('PayslipDetails');
-                      }}
+                      onPress={() => navigation.navigate('PayslipDetails')}
                       style={{ flexDirection: 'row', alignItems: 'center' }}
                     >
                       <Text style={styles.remotePunch}>View Payslip</Text>

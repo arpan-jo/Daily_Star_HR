@@ -293,6 +293,8 @@ const withoutEncryptionApi = [
   '/Document/UploadFile',
   '/Document/UploadProfilePicture',
   '/PdfAndExcelReport/EmployeePaySlipReport',
+  // Returns raw HTML (Type=htmlView), so it must bypass decryption.
+  '/PdfAndExcelReport/EmployeeSalaryPayslip',
   '/PdfAndExcelReport/BankAdviceReportForIBBL',
   '/document/downloadfile',
   'emp/Document/UploadFileBaseSixtyFour',
