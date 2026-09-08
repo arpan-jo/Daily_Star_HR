@@ -189,6 +189,27 @@ export const getSalaryPaySlipBonux = async (
   }
 };
 
+/**
+ * Server-rendered payslip (HTML). The endpoint is listed in
+ * withoutEncryptionApi, so the query stays plain and the body is not decrypted.
+ * Resolves to '' on any failure so callers can treat empty as "no payslip".
+ */
+export const getEmployeeSalaryPayslipHtml = async (
+  empId: number | null | undefined,
+  monthId: number | null | undefined,
+  yearId: number | null | undefined,
+): Promise<string> => {
+  try {
+    const res = await axios.get<string>(
+      `/PdfAndExcelReport/EmployeeSalaryPayslip?Type=htmlView&EmployeeId=${empId}&MonthId=${monthId}&YearId=${yearId}`,
+      { responseType: 'text' },
+    );
+    return typeof res?.data === 'string' ? res.data.trim() : '';
+  } catch {
+    return '';
+  }
+};
+
 export const getSalaryCode = async (
   accId: number | null | undefined,
   BusinessUnitId: number | null | undefined,
