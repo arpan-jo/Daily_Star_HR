@@ -1,4 +1,4 @@
-package com.peopledesk
+package com.ibos.dailystarhr
 
 import android.content.BroadcastReceiver
 import android.content.Context

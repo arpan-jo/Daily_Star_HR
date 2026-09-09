@@ -1,4 +1,4 @@
-package com.peopledesk
+package com.ibos.dailystarhr
 
 import android.Manifest
 import android.annotation.SuppressLint

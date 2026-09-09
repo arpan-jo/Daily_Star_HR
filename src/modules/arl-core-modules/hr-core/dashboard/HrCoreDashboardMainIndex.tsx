@@ -694,17 +694,6 @@ const HrCoreDashboardMainIndex = () => {
                       },
                     ]}
                   />
-                  <PerformanceMainIndex />
-
-                  <View
-                    style={[
-                      styles.bar,
-                      {
-                        marginTop: 3,
-                        marginVertical: 0,
-                      },
-                    ]}
-                  />
                 </>
               ) : null}
 

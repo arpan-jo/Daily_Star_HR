@@ -79,7 +79,6 @@ import {
 import { refreshTokenApi } from '../../../../services/auth/login';
 import { useRootStore } from '../../../../stores/rootStore';
 import AttendanceCalendarIndex from '../../../SaaS-modules/attendance-calendar/AttendanceCalendar';
-import EsgManagementMainIndex from '../../../SaaS-modules/dashboard/employeeDashboard/ESG-management/EsgManagementMainIndex';
 import NotificationCounter from '../../../SaaS-modules/dashboard/employeeDashboard/NotificationCounter';
 import InternalReferenceCard from '../../../SaaS-modules/dashboard/employeeDashboard/internal-reference-reward/InternalReferenceCard';
 
@@ -807,8 +806,6 @@ const HomeMainIndex = () => {
 
             <Row rowWidth="100%" style={styles.dividerStyle} />
 
-            <Row rowWidth="100%" style={styles.dividerStyle} />
-            {!isScanShow ? <EsgManagementMainIndex /> : null}
             <Row rowWidth="100%" style={styles.dividerStyle} />
             {/* Employee management */}
             {userInfo?.isSupNLMORManagement && !isScanShow ? (

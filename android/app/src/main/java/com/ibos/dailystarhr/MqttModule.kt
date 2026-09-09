@@ -1,4 +1,4 @@
-package com.peopledesk
+package com.ibos.dailystarhr
 
 import android.app.AlarmManager
 import android.content.Intent

@@ -30,7 +30,7 @@ import LoadingContainer from '../../../../common/components/Loading';
 import CustomModalNew from '../../../../common/components/CustomModal';
 import CustomInputNew from '../../../../common/components/CustomInput';
 import {useForm} from 'react-hook-form';
-import {rqDetailsStyle} from '../../../arl-core-modules/procurement/common/rqDetailsStyle';
+import {rqDetailsStyle} from '../../../arl-core-modules/shared/rqDetailsStyle';
 
 const edges: Edge[] = ['right', 'bottom', 'left'];
 

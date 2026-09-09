@@ -1,14 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
-import {HubConnectionBuilder, LogLevel} from '@microsoft/signalr';
-import {useIsFocused, useNavigation} from '@react-navigation/native';
-import {observer} from 'mobx-react-lite';
-import {useEffect, useState} from 'react';
-import {
-  Linking,
-  NativeModules,
-  Platform,
-  StyleSheet} from 'react-native';
-import type {Edge} from 'react-native-safe-area-context';
+import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { observer } from 'mobx-react-lite';
+import { useEffect, useState } from 'react';
+import { Linking, NativeModules, Platform, StyleSheet } from 'react-native';
+import type { Edge } from 'react-native-safe-area-context';
 import MCIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import MIcon from 'react-native-vector-icons/MaterialIcons';
 import Column from '../../../../common/components/Column';
@@ -16,33 +12,33 @@ import ContainerNew from '../../../../common/components/Container';
 import CustomHeader from '../../../../common/components/CustomHeader';
 import CustomModalNew from '../../../../common/components/CustomModal';
 import CustomTextNew from '../../../../common/components/CustomText';
-import {useToast} from '../../../../common/components/CustomToast';
+import { useToast } from '../../../../common/components/CustomToast';
 import Row from '../../../../common/components/Row';
 // import {setupCallKeepAndSIPFunc} from '../../../../common/constant/BodySensorPermission';
-import {COLORS} from '../../../../common/constant/Index';
+import { COLORS } from '../../../../common/constant/Index';
 import useAsyncEffect from '../../../../common/packages/useAsyncEffect/useAsyncEffect';
 import ThemePicker from '../../../../common/components/ThemePicker';
 import LanguagePicker from '../../../../common/components/LanguagePicker';
-import {t} from '../../../../common/constant/i18n';
-import {useMoreScreenLogic} from '../../../../hooks/useMoreScreenLogic';
-import {getAllNotificationCount} from '../../../../services/SaaS-modules/dashboard/employeeDashboard';
-import {useRootStore} from '../../../../stores/rootStore';
+import { t } from '../../../../common/constant/i18n';
+import { useMoreScreenLogic } from '../../../../hooks/useMoreScreenLogic';
+import { getAllNotificationCount } from '../../../../services/SaaS-modules/dashboard/employeeDashboard';
+import { useRootStore } from '../../../../stores/rootStore';
 import NotificationCounter from '../../../SaaS-modules/dashboard/employeeDashboard/NotificationCounter';
 import MenuItem from '../../shared/MenuItem';
 import ProfileHeader from '../../shared/ProfileHeader';
-import {GoogleSignin} from '@react-native-google-signin/google-signin';
-const {MqttModule} = NativeModules || {};
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+const { MqttModule } = NativeModules || {};
 const edges: Edge[] = ['right', 'left'];
 
 const HRMoreMainIndex = () => {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
-  const {userInfo, userInfoSave} = useRootStore();
+  const { userInfo, userInfoSave } = useRootStore();
   const toaster = useToast();
   const [notificationCounter, setNotificationCounter] = useState<number>(0);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isModalForBiometric, setIsModalForBiometric] = useState(false);
-  const {empDashboardData, url, isUpdate, clearAll} =
+  const { empDashboardData, url, isUpdate, clearAll } =
     useMoreScreenLogic(navigation);
   const [emailInput, setEmailInput] = useState(userInfo?.loginEmail || '');
   const [passwordInput, setPasswordInput] = useState('');
@@ -119,14 +115,15 @@ const HRMoreMainIndex = () => {
           }
         />
       }
-      style={styles.container}>
+      style={styles.container}
+    >
       <ProfileHeader
         empDashboardData={empDashboardData}
         userInfo={userInfo}
         showDetails={true}
         onDetailsPress={() => {
           //@ts-ignore
-          navigation.navigate('EmpolyeeSelfDetails', {empDashboardData});
+          navigation.navigate('EmpolyeeSelfDetails', { empDashboardData });
         }}
       />
 
@@ -233,7 +230,7 @@ const HRMoreMainIndex = () => {
           title={t('more.rateApp')}
           onPress={() =>
             Linking.openURL(
-              'https://play.google.com/store/apps/details?id=com.peopledesk',
+              'https://play.google.com/store/apps/details?id=com.ibos.dailystarhr',
             )
           }
         />
@@ -322,11 +319,15 @@ const HRMoreMainIndex = () => {
         deleteText={t('common.confirm')}
       />
       {/* Social Media Section */}
-      <Row direction="row" rowStyle={[styles.mainRow, {borderBottomWidth: 0}]}>
+      <Row
+        direction="row"
+        rowStyle={[styles.mainRow, { borderBottomWidth: 0 }]}
+      >
         <Row
           align="center"
           rowStyle={styles.paddingHorizontalAndVertical}
-          isPressOn={false}>
+          isPressOn={false}
+        >
           <Column colWidth="100%">
             <CustomTextNew text={t('more.followUs')} subTxt padTop={8} />
             <Row style={styles.colDirection}>
@@ -334,7 +335,8 @@ const HRMoreMainIndex = () => {
                 isPressOn={false}
                 onCardPress={() =>
                   Linking.openURL('https://www.facebook.com/iboslimited/')
-                }>
+                }
+              >
                 <MIcon
                   name="facebook"
                   color={'#0163E0'}
@@ -348,7 +350,8 @@ const HRMoreMainIndex = () => {
                   Linking.openURL(
                     'https://www.linkedin.com/company/iboslimited',
                   )
-                }>
+                }
+              >
                 <MCIcon
                   name="linkedin"
                   color={'#1275B1'}
@@ -360,7 +363,8 @@ const HRMoreMainIndex = () => {
                 isPressOn={false}
                 onCardPress={() =>
                   Linking.openURL('https://www.youtube.com/@iBOSLimited/')
-                }>
+                }
+              >
                 <MCIcon
                   name="youtube"
                   color={'#FC0D1B'}

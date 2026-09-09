@@ -11,7 +11,7 @@ import Row from '../../../../common/components/Row';
 import {COLORS} from '../../../../common/constant/Themes';
 import {date_formater} from '../../../../common/services/dateFormater';
 import {getEprocurementImageURL} from '../../../../common/services/getImage';
-import {rqDetailsStyle} from '../../../arl-core-modules/procurement/common/rqDetailsStyle';
+import {rqDetailsStyle} from '../../../arl-core-modules/shared/rqDetailsStyle';
 
 const edges: Edge[] = ['right', 'bottom', 'left'];
 

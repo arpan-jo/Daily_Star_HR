@@ -1,4 +1,4 @@
-package com.peopledesk // replace com.your-app-name with your app’s name
+package com.ibos.dailystarhr
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothHeadset
 import android.graphics.Bitmap

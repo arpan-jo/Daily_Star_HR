@@ -22,8 +22,8 @@ import useAuditLogSave from '../../../../common/hooks/useAuditLogSave';
 import useAsyncEffect from '../../../../common/packages/useAsyncEffect/useAsyncEffect';
 import {getPlantDDL} from '../../../../services/arl-core-modules/procurement/purchaseRequest/purchaseRequestAPI';
 import {useRootStore} from '../../../../stores/rootStore';
-import {commonPRLanStyle as styles} from '../../../arl-core-modules/procurement/common/commonPRLanStyle';
-import ProcurementCard from '../../../arl-core-modules/procurement/ProcurementLandingCard';
+import {commonPRLanStyle as styles} from '../../../arl-core-modules/shared/commonPRLanStyle';
+import ProcurementCard from '../../../arl-core-modules/shared/ProcurementLandingCard';
 const edges1: Edge[] = ['right', 'bottom', 'left', 'top'];
 const edges2: Edge[] = ['right', 'bottom', 'left'];
 

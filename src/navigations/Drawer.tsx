@@ -2,7 +2,7 @@ import NetInfo from '@react-native-community/netinfo';
 import {
   DrawerScreenProps,
   createDrawerNavigator} from '@react-navigation/drawer';
-import { NavigatorScreenParams, useIsFocused, useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import React, { Fragment, useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { arlURL, commonURL } from '../../App';
@@ -16,8 +16,7 @@ import EmpManagementMainIndex from '../modules/SaaS-modules/employeeManagement/E
 import { getMenuPermissionAPI } from '../services/SaaS-modules/drawer/drawer';
 import { useRootStore } from '../stores/rootStore';
 import CustomDrawer from './CustomDrawer';
-import { RootStackScreensParams } from './RootStack';
-import { TopTabScreensParams } from './TopTab';
+import { RootStackScreensParams } from './RootStackScreensParams';
 import { CompositeScreenProps } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import useAsyncEffect from '../common/packages/useAsyncEffect/useAsyncEffect';
@@ -51,7 +50,6 @@ export type DrawerScreensParams = {
   ['Training & Development']: undefined;
   ['Provident & Fund']: undefined;
   ['Grievance Management']: undefined;
-  TopTab: undefined | NavigatorScreenParams<TopTabScreensParams>;
   Application: undefined;
   Approval: undefined;
 };

@@ -1,14 +1,13 @@
-import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import React from 'react';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {COLORS} from '../common/constant/Themes';
+import { COLORS } from '../common/constant/Themes';
 import HrCoreApplicationMainIndex from '../modules/arl-core-modules/hr-core/application/HrCoreApplicationMainIndex';
 import HrCoreApprovalsMainIndex from '../modules/arl-core-modules/hr-core/approvals/HrCoreApprovalsMainIndex';
 import HrCoreDashboardMainIndex from '../modules/arl-core-modules/hr-core/dashboard/HrCoreDashboardMainIndex';
-import HrCoreReportsMainIndex from '../modules/arl-core-modules/hr-core/reports/HrCoreReportsMainIndex';
 import useThemeId from '../hooks/useThemeId';
-import {t} from '../common/constant/i18n';
+import { t } from '../common/constant/i18n';
 
 // export type HrCoreBottomTabScreens = keyof HrCoreBottomTabScreensParams;
 
@@ -23,13 +22,13 @@ import {t} from '../common/constant/i18n';
 //   route: RouteProp<HrCoreBottomTabScreensParams, T>;
 // }
 
-const {Navigator, Screen} = createMaterialBottomTabNavigator();
+const { Navigator, Screen } = createMaterialBottomTabNavigator();
 
 const HrCoreBottomTab = () => {
   // Re-render on theme change so the tab tints below pick up the new
   // palette without remounting the navigator (which would reset the route).
   useThemeId();
-  const {bottom} = useSafeAreaInsets();
+  const { bottom } = useSafeAreaInsets();
 
   return (
     <Navigator
@@ -41,15 +40,16 @@ const HrCoreBottomTab = () => {
         backgroundColor: COLORS.white,
         height: bottom > 0 ? 76 + bottom : 76,
       }}
-      safeAreaInsets={{bottom: bottom > 0 ? bottom : 10}}
+      safeAreaInsets={{ bottom: bottom > 0 ? bottom : 10 }}
       labeled={true}
-      shifting={false}>
+      shifting={false}
+    >
       <Screen
         name="Dashboard"
         component={HrCoreDashboardMainIndex}
         options={{
           tabBarLabel: t('tab.dashboard'),
-          tabBarIcon: ({color, focused}) => (
+          tabBarIcon: ({ color, focused }: any) => (
             <Icon
               name={focused ? 'home' : 'home-outline'}
               color={color}
@@ -63,7 +63,7 @@ const HrCoreBottomTab = () => {
         component={HrCoreApplicationMainIndex}
         options={{
           tabBarLabel: t('tab.application'),
-          tabBarIcon: ({color, focused}) => (
+          tabBarIcon: ({ color, focused }: any) => (
             <Icon
               name={focused ? 'text-box' : 'text-box-outline'}
               color={color}
@@ -77,23 +77,9 @@ const HrCoreBottomTab = () => {
         component={HrCoreApprovalsMainIndex}
         options={{
           tabBarLabel: t('tab.approval'),
-          tabBarIcon: ({color, focused}) => (
+          tabBarIcon: ({ color, focused }: any) => (
             <Icon
               name={focused ? 'calendar-check' : 'calendar-check-outline'}
-              color={color}
-              size={26}
-            />
-          ),
-        }}
-      />
-      <Screen
-        name="Report"
-        component={HrCoreReportsMainIndex}
-        options={{
-          tabBarLabel: t('tab.report'),
-          tabBarIcon: ({color, focused}) => (
-            <Icon
-              name={focused ? 'file-document' : 'file-document-outline'}
               color={color}
               size={26}
             />

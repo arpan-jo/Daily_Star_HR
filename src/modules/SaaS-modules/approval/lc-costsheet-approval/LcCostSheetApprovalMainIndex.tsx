@@ -21,7 +21,7 @@ import Row from '../../../../common/components/Row';
 import {httpRequest} from '../../../../common/constant/httpRequest';
 import useAuditLogSave from '../../../../common/hooks/useAuditLogSave';
 import {useRootStore} from '../../../../stores/rootStore';
-import {commonPRLanStyle as styles} from '../../../arl-core-modules/procurement/common/commonPRLanStyle';
+import {commonPRLanStyle as styles} from '../../../arl-core-modules/shared/commonPRLanStyle';
 import LandingCostTable from './LcCostSheetTable';
 import CustomTextNew from '../../../../common/components/CustomText';
 import {Text} from 'react-native';

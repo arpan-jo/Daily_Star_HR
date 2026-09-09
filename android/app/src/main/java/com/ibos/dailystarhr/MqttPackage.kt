@@ -1,4 +1,4 @@
-package com.peopledesk
+package com.ibos.dailystarhr
 
 import com.facebook.react.ReactPackage
 import com.facebook.react.bridge.NativeModule

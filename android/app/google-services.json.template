@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:66345309507:android:ae394dbb87fdbfd1c74bf6",
         "android_client_info": {
-          "package_name": "com.peopledesk"
+          "package_name": "com.ibos.dailystarhr"
         }
       },
       "oauth_client": [
@@ -17,7 +17,7 @@
           "client_id": "66345309507-4jvdgv5nnt957f2hprcgc8p7e6r5pj8v.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.peopledesk",
+            "package_name": "com.ibos.dailystarhr",
             "certificate_hash": "26b85b90d0cdc43d11d673343efe03b9c4cd17b5"
           }
         },
@@ -25,7 +25,7 @@
           "client_id": "66345309507-d15phik256601vlfub3u7jkus947b70r.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.peopledesk",
+            "package_name": "com.ibos.dailystarhr",
             "certificate_hash": "6245c63e67153fead2cdc84790a957e03df5e2dc"
           }
         },
@@ -33,7 +33,7 @@
           "client_id": "66345309507-f3cp78co11204t2gh513cb8fas748bvs.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.peopledesk",
+            "package_name": "com.ibos.dailystarhr",
             "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
           }
         },

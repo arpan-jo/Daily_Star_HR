@@ -1,4 +1,4 @@
-package com.peopledesk.liveKit
+package com.ibos.dailystarhr.liveKit
 
 import com.facebook.react.ReactPackage
 import com.facebook.react.bridge.ReactApplicationContext
