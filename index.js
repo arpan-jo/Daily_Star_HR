@@ -1,3 +1,6 @@
+// Must stay the first import: react-native-gesture-handler patches the event
+// system at load time, and the drawer's pan gesture depends on it.
+import 'react-native-gesture-handler';
 import notifee, {
     AndroidColor,
     AndroidImportance,
