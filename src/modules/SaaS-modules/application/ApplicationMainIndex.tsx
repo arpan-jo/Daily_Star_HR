@@ -7,6 +7,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { Edge } from 'react-native-safe-area-context';
 import MIcon from 'react-native-vector-icons/MaterialIcons';
+import { commonURL } from '../../../../App';
 import ContainerNew from '../../../common/components/Container';
 import CustomHeader from '../../../common/components/CustomHeader';
 import { IMAGES } from '../../../common/constant/Index';
@@ -85,6 +86,10 @@ const ApplicationMainIndex = observer<DrawerScreenProps<'Leave'>>(
         header={
           <CustomHeader
             onLeftMenuPress={navigation.toggleDrawer}
+            isSubtitleClickable={commonURL === userInfo?.strUrl}
+            subtitle={
+              commonURL === userInfo?.strUrl ? userInfo?.strWorkplaceGroup : ''
+            }
             title="Application"
             // components={
             //   <TouchableOpacity style={styles.buttonArrow} onPress={() => setIsShowUp(!isShowUp)}>

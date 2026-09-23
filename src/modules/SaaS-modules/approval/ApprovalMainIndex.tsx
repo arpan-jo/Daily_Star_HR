@@ -98,7 +98,7 @@ const ApprovalMainIndex = observer<DrawerScreenProps<'Approval'>>(
         getMenuData();
         getWorkplaceData();
       },
-      [isFoucused, isLoadAgain, topBar],
+      [isFoucused, isLoadAgain, topBar, userInfo?.intWorkplaceGroupId],
     );
     console.log('workplace id', selectedWorkplaceId);
     useAsyncEffect(
@@ -273,6 +273,10 @@ const ApprovalMainIndex = observer<DrawerScreenProps<'Approval'>>(
         header={
           <CustomHeader
             onLeftMenuPress={navigation.toggleDrawer}
+            isSubtitleClickable={commonURL === userInfo?.strUrl}
+            subtitle={
+              commonURL === userInfo?.strUrl ? userInfo?.strWorkplaceGroup : ''
+            }
             title="Approval"
           />
         }

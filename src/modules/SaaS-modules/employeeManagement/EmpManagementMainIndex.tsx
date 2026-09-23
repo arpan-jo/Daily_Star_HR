@@ -59,7 +59,13 @@ const EmpManagementMainIndex = observer<
       // handleEmpDdlData();
       // reset();
     },
-    [isFocused, currentPage, searchQuery, !isSearch],
+    [
+      isFocused,
+      currentPage,
+      searchQuery,
+      !isSearch,
+      userInfo?.intWorkplaceGroupId,
+    ],
   );
   // const {control, setValue, reset} = useForm({
   //   defaultValues: {
@@ -170,6 +176,12 @@ const EmpManagementMainIndex = observer<
                 setIsSearch(!isSearch);
                 LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
               }}
+              isSubtitleClickable={commonURL === userInfo?.strUrl}
+              subtitle={
+                commonURL === userInfo?.strUrl
+                  ? userInfo?.strWorkplaceGroup
+                  : ''
+              }
               title="Employee Management"
             />
           )}

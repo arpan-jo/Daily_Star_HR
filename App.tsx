@@ -21,6 +21,7 @@ import axios from 'axios';
 import { observer } from 'mobx-react-lite';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Linking, LogBox, Platform } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 // import BootSplash from 'react-native-bootsplash';
 import { Provider as PaperProvider } from 'react-native-paper';
 import {
@@ -262,23 +263,25 @@ const Main = observer(() => {
   }, [hydrate, syncScreenName]);
 
   return (
-    <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-      <PaperProvider theme={theme}>
-        <ToastProvider>
-          <NavigationContainer
-            linking={linking}
-            theme={theme}
-            ref={setNavigationRef}
-            onReady={onReady}
-            onStateChange={syncScreenName}
-          >
-            {/* Keyed on the language: switching remounts the tree so every
-                render-time t() returns the new strings without a relaunch. */}
-            <RootStack key={language} />
-          </NavigationContainer>
-        </ToastProvider>
-      </PaperProvider>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+        <PaperProvider theme={theme}>
+          <ToastProvider>
+            <NavigationContainer
+              linking={linking}
+              theme={theme}
+              ref={setNavigationRef}
+              onReady={onReady}
+              onStateChange={syncScreenName}
+            >
+              {/* Keyed on the language: switching remounts the tree so every
+                  render-time t() returns the new strings without a relaunch. */}
+              <RootStack key={language} />
+            </NavigationContainer>
+          </ToastProvider>
+        </PaperProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 });
 
