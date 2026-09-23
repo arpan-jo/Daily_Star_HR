@@ -5,17 +5,21 @@ export const attendanceStatus = async (
   setIsLoading: any,
   cb: any,
 ) => {
+  // The loading flag has to go up here: callers disable the check-in button on
+  // it, and without that the button stays tappable for the whole round trip,
+  // which lets a double tap punch twice.
+  setIsLoading(true);
   try {
     cb();
     const res = await axios.post('/TimeSheet/RemoteAttendance', payload);
-    if (res?.data?.statusCode === 200) {
-      setIsLoading(false);
-      return res?.data;
-    }
+    // A failure comes back as HTTP 200 with a non-200 statusCode in the body,
+    // and callers branch on that statusCode - so return the body either way.
+    return res?.data;
   } catch (error) {
-    setIsLoading(false);
     //@ts-ignore
     return error?.response?.data;
+  } finally {
+    setIsLoading(false);
   }
 };
 
