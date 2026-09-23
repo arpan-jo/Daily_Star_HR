@@ -1,4 +1,4 @@
-package com.peopledesk
+package net.thedailystar
 
 import android.content.BroadcastReceiver
 import android.content.Context

@@ -160,26 +160,26 @@
         android:value="${MY_API_KEY}" />
 
         <service
-            android:name="com.peopledesk.MqttService"
+            android:name="net.thedailystar.MqttService"
             android:exported="false"
             android:foregroundServiceType="location" />
         <receiver
-            android:name="com.peopledesk.LocationReciever"
+            android:name="net.thedailystar.LocationReciever"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
-                <action android:name="com.peopledesk.RESTART_MQTT"/>
+                <action android:name="net.thedailystar.RESTART_MQTT"/>
             </intent-filter>
         </receiver>
 
         <receiver
-            android:name="com.peopledesk.MqttService$MqttActivityReceiver"
+            android:name="net.thedailystar.MqttService$MqttActivityReceiver"
             android:exported="false"
             android:enabled="true" />
 
         <receiver
-            android:name="com.peopledesk.UnifiedMotionActivityModule$SmoothActivityReceiver"
+            android:name="net.thedailystar.UnifiedMotionActivityModule$SmoothActivityReceiver"
             android:exported="false"
             android:enabled="true" />
 

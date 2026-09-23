@@ -1,4 +1,4 @@
-package com.peopledesk
+package net.thedailystar
 
 import android.app.Application
 import com.facebook.react.PackageList
@@ -9,7 +9,7 @@ import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 
 import com.printer.PocketPrinterPackage
 import com.security.SecurityPackage
-import com.peopledesk.liveKit.LiveKitServicePackage;
+import net.thedailystar.liveKit.LiveKitServicePackage;
 
 class MainApplication : Application(), ReactApplication {
 

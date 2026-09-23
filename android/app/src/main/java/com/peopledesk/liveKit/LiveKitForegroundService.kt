@@ -1,4 +1,4 @@
-package com.peopledesk.liveKit
+package net.thedailystar.liveKit
 
 import android.app.*
 import android.content.Intent
@@ -11,7 +11,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.modules.core.DeviceEventManagerModule
-import com.peopledesk.R
+import net.thedailystar.R
 import io.livekit.android.LiveKit
 import io.livekit.android.events.RoomEvent
 import io.livekit.android.events.collect

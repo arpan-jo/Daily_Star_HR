@@ -189,7 +189,7 @@ const Login = observer<RootStackScreenProps<'Login'>>(({ navigation }) => {
       <View style={styles.main}>
         <View>
           <Image source={IMAGES.AppLogo} style={styles.logo} />
-          <Text style={styles.appName}>Daily Star</Text>
+          <Text style={styles.appName}>StarPeople</Text>
         </View>
         <View style={styles.paddingBtm10}>
           <CustomInputNew

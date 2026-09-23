@@ -1,4 +1,4 @@
-package com.peopledesk
+package net.thedailystar
 
 import android.util.Log
 import org.eclipse.paho.client.mqttv3.*

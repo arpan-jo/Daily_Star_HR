@@ -1,4 +1,4 @@
-package com.peopledesk.liveKit
+package net.thedailystar.liveKit
 
 import com.facebook.react.ReactPackage
 import com.facebook.react.bridge.ReactApplicationContext

@@ -1,4 +1,4 @@
-package com.peopledesk
+package net.thedailystar
 
 import android.content.Intent
 import android.content.pm.PackageManager

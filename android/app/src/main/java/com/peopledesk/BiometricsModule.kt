@@ -1,4 +1,4 @@
-package com.peopledesk
+package net.thedailystar
 
 
 import androidx.biometric.BiometricPrompt

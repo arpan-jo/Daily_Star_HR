@@ -1,4 +1,4 @@
-package com.peopledesk
+package net.thedailystar
 
 import android.app.*
 import android.content.*
@@ -31,7 +31,7 @@ class MqttService : Service(), BluetoothDeviceListener {
         const val DEFAULT_TO_MINUTES = 18 * 60
 
         /** Matches the intent-filter LocationReciever is registered for. */
-        const val ACTION_RESTART = "com.peopledesk.RESTART_MQTT"
+        const val ACTION_RESTART = "net.thedailystar.RESTART_MQTT"
 
         private const val NOTIF_ID = 1
         private const val WINDOW_CHECK_INTERVAL_MS = 60_000L
