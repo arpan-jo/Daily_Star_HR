@@ -1,6 +1,7 @@
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import dayjs from 'dayjs';
-import React, { useState } from 'react';
+import { observer } from 'mobx-react-lite';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -42,6 +43,7 @@ import useAsyncEffect from '../../../../common/packages/useAsyncEffect/useAsyncE
 import { useForm } from 'react-hook-form';
 
 import { getLocationName } from '../../../../common/constant/GetLocationName';
+import { getDistanceInMeters } from '../../../../common/services/getDistanceInMeters';
 import FaceCaptureForRemoteAttandance from './FaceCaptureForRemoteAttandance';
 import axios from 'axios';
 
@@ -59,14 +61,22 @@ const d = [
 interface props {
   route?: any;
 }
+// Below this, a new GPS fix is treated as the same spot and not published to
+// state. Well under the 50m reverse-geocode cache radius, so the displayed
+// address still refreshes as soon as it can actually change.
+const MIN_PUBLISH_MOVE_METERS = 10;
+
 const faceClient = axios.create({
   baseURL: 'https://face.ibos.io/api',
+  // Without this a stalled connection leaves the camera mounted behind a
+  // "Verifying face..." overlay that the user cannot dismiss.
+  timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
     accept: 'application/json',
   },
 });
-const RemoteAttendanceMainIndex = ({ route }: props) => {
+const RemoteAttendanceMainIndex = observer(({ route }: props) => {
   const employeeData = route?.params?.employeeData;
 
   const navigation = useNavigation();
@@ -74,15 +84,25 @@ const RemoteAttendanceMainIndex = ({ route }: props) => {
   const isFocused = useIsFocused();
   const toaster = useToast();
   const [location2, setLocation2] = useState<any>(null);
+  const lastPublishedRef = useRef<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
+  // `mocked` lives on GeoPosition, not on GeoPosition.coords, and location2
+  // only ever holds coords - so it has to be tracked separately.
+  const [isMockLocation, setIsMockLocation] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoading2, setIsLoading2] = useState(false);
-  const [attendanceSts, setAttendanceSts] = useState();
+  const [attendanceSts, setAttendanceSts] = useState<any>();
   const [locationPunchData, setLocationPunchData] =
     useState<PunchLandDataType[]>();
   const [attendanceSetup, setAttendanceSetup] = useState<AttendanceSetupType>();
-  const [deviceName, setDeviceName] = useState('');
+  // Payload-only values. Refs so the async payload builders read the resolved
+  // value instead of whatever the closure captured at mount.
+  const attendanceSetupRef = useRef<AttendanceSetupType | undefined>(undefined);
+  const deviceUniqueIdRef = useRef('');
+  const deviceNameRef = useRef('');
   const { control, handleSubmit, setValue, reset, watch } = useForm({});
-  const [deviceUniqueId, setDeviceUniqueId] = useState('');
   const [showFaceCapture, setShowFaceCapture] = useState(false);
   const [verifiedEmployeeName, setVerifiedEmployeeName] = useState<
     string | null
@@ -95,49 +115,69 @@ const RemoteAttendanceMainIndex = ({ route }: props) => {
 
   useAsyncEffect(
     async isMounted => {
-      if (!isMounted()) {
+      // isFocused also flips to false on navigate-away, which used to re-run
+      // this entire cascade on the way out.
+      if (!isFocused || !isMounted()) {
         return;
       }
 
-      DeviceInfo.getUniqueId().then(uniqueId => {
-        setDeviceUniqueId(uniqueId);
-      });
-
-      DeviceInfo.getDeviceName().then(name => {
-        setDeviceName(name);
-      });
-
-      VersionCheck.needUpdate().then(async res => {
-        if (res?.isNeeded) {
-          Linking.openURL(res.storeUrl); // open store if update is needed.
-        }
-      });
+      VersionCheck.needUpdate()
+        .then(res => {
+          if (res?.isNeeded && res?.storeUrl) {
+            return Linking.openURL(res.storeUrl);
+          }
+        })
+        .catch(err => console.log('version check failed', err));
 
       getLocation();
-      attdcBtn();
+
+      // Must resolve before the status call below: that payload carries the
+      // device id, and it used to be sent empty on every mount because these
+      // were still unset. Refs, not state, because nothing renders them and
+      // the callbacks outlived the screen.
+      try {
+        const [uniqueId, name] = await Promise.all([
+          DeviceInfo.getUniqueId(),
+          DeviceInfo.getDeviceName(),
+        ]);
+        deviceUniqueIdRef.current = uniqueId;
+        deviceNameRef.current = name;
+      } catch (err) {
+        console.log('device info failed', err);
+      }
+
       const res = await getAttendanceSetup(
         userInfo?.intAccountId,
         userInfo?.intBusinessUnitId,
         setIsLoading,
       );
+      if (!isMounted()) return;
 
+      attendanceSetupRef.current = res?.[0];
       setAttendanceSetup(res?.[0]);
+
+      // Now that the setup and device id are known, the status call sends a
+      // complete payload.
+      await attdcBtn();
+      if (!isMounted()) return;
+
       const attDncePunch = await remoteAttendancePunchList(
         employeeId,
         userInfo?.intBusinessUnitId,
         setIsLoading2,
       );
 
-      if (attDncePunch) {
+      if (attDncePunch && isMounted()) {
         setLocationPunchData(attDncePunch);
-        attdcBtn();
       }
     },
     [userInfo, isFocused],
   );
 
   const attdcBtn = async (partId?: number) => {
-    getLocation();
+    // No getLocation() here: it resolves asynchronously, so the gate below and
+    // the payload would still read the previous fix. watchPosition is what
+    // keeps location2 current.
     if (!location2?.longitude && partId === 2) {
       toaster.show({ message: 'Check GPS', type: 'error' });
       return;
@@ -151,14 +191,15 @@ const RemoteAttendanceMainIndex = ({ route }: props) => {
       longitude: partId === 2 ? location2?.longitude?.toString() : '',
       latitude: partId === 2 ? location2?.latitude?.toString() : '',
       realTimeImageId: 0,
-      deviceId: attendanceSetup?.isDeviceRegNeed ? deviceUniqueId : '',
-      deviceName: attendanceSetup?.isDeviceRegNeed ? deviceName : '',
+      deviceId: attendanceSetupRef.current?.isDeviceRegNeed ? deviceUniqueIdRef.current : '',
+      deviceName: attendanceSetupRef.current?.isDeviceRegNeed ? deviceNameRef.current : '',
       visitingLocation: watch('location') || '',
       isMarket: false,
     };
-    const attDnce = await attendanceStatus(payload, setIsLoading, () =>
-      getLocation(),
-    );
+    // The callback fires before the POST and the payload above is already
+    // built, so refreshing the fix here could never affect it. watchPosition
+    // keeps location2 current anyway.
+    const attDnce = await attendanceStatus(payload, setIsLoading, () => {});
     // if (attDnce?.statusCode === 500) {
     //   toaster.show({ message: attDnce?.message, type: 'error' });
     // }
@@ -174,7 +215,6 @@ const RemoteAttendanceMainIndex = ({ route }: props) => {
         setIsLoading2,
       );
       if (attDncePunch) {
-        getLocation();
         setLocationPunchData(attDncePunch);
       }
       setAttendanceSts(attDnce);
@@ -193,17 +233,10 @@ const RemoteAttendanceMainIndex = ({ route }: props) => {
         // handleUploadProfileImage();
       } else {
         getLocation();
-        // 2 for check-in-out
-        attdcBtn(2);
-        const attDncePunch = await remoteAttendancePunchList(
-          employeeId,
-          userInfo?.intBusinessUnitId,
-          setIsLoading2,
-        );
-        if (attDncePunch) {
-          setLocationPunchData(attDncePunch);
-          attdcBtn();
-        }
+        // 2 for check-in-out. Awaited: it already refetches the punch list on
+        // success, so the extra fetch that used to follow raced the POST and
+        // rendered the pre-punch list.
+        await attdcBtn(2);
       }
     }
   };
@@ -240,8 +273,8 @@ const RemoteAttendanceMainIndex = ({ route }: props) => {
   //       longitude: location2?.longitude?.toString() || '',
   //       latitude: location2?.latitude?.toString() || '',
   //       realTimeImageId: response?.globalFileUrlId,
-  //       deviceId: attendanceSetup?.isDeviceRegNeed ? deviceUniqueId : '',
-  //       deviceName: attendanceSetup?.isDeviceRegNeed ? deviceName : '',
+  //       deviceId: attendanceSetupRef.current?.isDeviceRegNeed ? deviceUniqueIdRef.current : '',
+  //       deviceName: attendanceSetupRef.current?.isDeviceRegNeed ? deviceNameRef.current : '',
   //       visitingLocation: watch('location') || '',
   //       isMarket: false,
   //     };
@@ -342,9 +375,12 @@ const RemoteAttendanceMainIndex = ({ route }: props) => {
               'Fake Location Detected',
               'Mock location is not allowed. Please turn off mock location and try again.',
             );
+            lastPublishedRef.current = null;
+            setIsMockLocation(true);
             setLocation2(null);
             return;
           }
+          setIsMockLocation(false);
           setLocation2(position?.coords);
         },
         error => {
@@ -375,10 +411,36 @@ const RemoteAttendanceMainIndex = ({ route }: props) => {
       watchId = Geolocation.watchPosition(
         position => {
           if (position?.mocked) {
+            lastPublishedRef.current = null;
+            setIsMockLocation(true);
             setLocation2(null);
             return;
           }
-          setLocation2(position?.coords);
+          setIsMockLocation(false);
+          const coords = position?.coords;
+          if (!coords) return;
+
+          // distanceFilter is 0, so this fires every ~2s with a brand new
+          // coords object. Publishing each one re-renders the map, the punch
+          // list, the reverse-geocode effect and the face-capture child (which
+          // rebuilds the camera frame processor). Only publish real movement.
+          const last = lastPublishedRef.current;
+          if (
+            last &&
+            getDistanceInMeters(
+              last.latitude,
+              last.longitude,
+              coords.latitude,
+              coords.longitude,
+            ) < MIN_PUBLISH_MOVE_METERS
+          ) {
+            return;
+          }
+          lastPublishedRef.current = {
+            latitude: coords.latitude,
+            longitude: coords.longitude,
+          };
+          setLocation2(coords);
         },
         error => {
           setLocation2(null);
@@ -451,22 +513,22 @@ const RemoteAttendanceMainIndex = ({ route }: props) => {
         user_id: userInfo?.intEmployeeId?.toString(),
       };
       const response = await faceClient.post('/v1/check-attendance', payload);
-      console.log('response', JSON.stringify(response?.data, null, 2));
       return response?.data;
-    } catch (error) {
-      console.log(
-        'Face verify error',
-        JSON.stringify(error?.response, null, 2),
-      );
-      return (
-        error?.response?.data?.details ||
-        error?.response?.data?.message ||
-        'Face verification failed'
-      );
+    } catch (error: any) {
+      // Must keep the same shape as the success body. Returning a bare string
+      // here meant the caller's `verifyRes?.message` was always undefined, so
+      // the server's actual reason was replaced by a generic message.
+      return {
+        isAttendance: false,
+        message:
+          error?.response?.data?.details ||
+          error?.response?.data?.message ||
+          'Face verification failed',
+      };
     }
   };
   const handleFaceCaptured = async (base64Image: string) => {
-    if (location2?.mocked) {
+    if (isMockLocation) {
       toaster.show({
         message: 'Mock location is not allowed. Please turn off mock location.',
         type: 'error',
@@ -478,7 +540,6 @@ const RemoteAttendanceMainIndex = ({ route }: props) => {
 
     // Step 1: verify face
     const verifyRes = await verifyFace(base64Image);
-    console.log('verifyRes', JSON.stringify(verifyRes, null, 2));
 
     if (!verifyRes?.isAttendance) {
       setFaceVerifyLoading(false);
@@ -498,17 +559,14 @@ const RemoteAttendanceMainIndex = ({ route }: props) => {
       longitude: loc?.longitude?.toString() || '',
       latitude: loc?.latitude?.toString() || '',
       realTimeImageId: 0,
-      deviceId: attendanceSetup?.isDeviceRegNeed ? deviceUniqueId : '',
-      deviceName: attendanceSetup?.isDeviceRegNeed ? deviceName : '',
+      deviceId: attendanceSetupRef.current?.isDeviceRegNeed ? deviceUniqueIdRef.current : '',
+      deviceName: attendanceSetupRef.current?.isDeviceRegNeed ? deviceNameRef.current : '',
       isMarket: false,
       intWorkplaceGroupId: userInfo?.intWorkplaceGroupId,
     };
 
-    const attDnce = await attendanceStatus(payload, setIsLoading, () => {
-      getLocation();
-    });
+    const attDnce = await attendanceStatus(payload, setIsLoading, () => {});
     setFaceVerifyLoading(false);
-    console.log('attendance response', JSON.stringify(attDnce, null, 2));
     if (!attDnce || attDnce?.statusCode !== 200) {
       setFailureMessage(attDnce?.message || 'Attendance recording failed!');
       setVerificationFailed(true);
@@ -521,7 +579,7 @@ const RemoteAttendanceMainIndex = ({ route }: props) => {
       verifyRes?.employee_name ||
       userInfo?.strDisplayName ||
       'Employee';
-    const prevStatus = (attendanceSts as any)?.message;
+    const prevStatus = attendanceSts?.message;
     const attMsg =
       prevStatus === 'AO' ? 'Check-out Successful!' : 'Attendance successful';
 
@@ -533,22 +591,39 @@ const RemoteAttendanceMainIndex = ({ route }: props) => {
     setShowFaceCapture(false);
     setVerifiedEmployeeName(null);
     setSuccessMessage(null);
-    // Refresh status and punch list after attendance recorded
-    attdcBtn();
-    const attDncePunch = await remoteAttendancePunchList(
-      employeeId,
-      userInfo?.intBusinessUnitId,
-      setIsLoading2,
-    );
-    if (attDncePunch) {
-      setLocationPunchData(attDncePunch);
-    }
+    // Refreshes status and, on success, the punch list too — so the second
+    // fetch that used to run here was a duplicate GET racing this one.
+    await attdcBtn();
   };
 
-  const handleErrorDismiss = () => {
+  const handleErrorDismiss = useCallback(() => {
     setVerificationFailed(false);
     setFailureMessage(null);
-  };
+  }, []);
+
+  // Stable identities, so memoising the camera child actually holds.
+  const handleFaceError = useCallback(
+    (msg: string) => {
+      setShowFaceCapture(false);
+      toaster.show({
+        message: msg || 'Face detection Failed',
+        type: 'error',
+      });
+    },
+    [toaster],
+  );
+
+  const handleFaceCancel = useCallback(() => setShowFaceCapture(false), []);
+
+  // Shared by the Marker and the Circle, so they get one identity per fix
+  // instead of two new objects per render.
+  const mapCoordinate = useMemo(
+    () => ({
+      latitude: location2?.latitude,
+      longitude: location2?.longitude,
+    }),
+    [location2?.latitude, location2?.longitude],
+  );
 
   if (showFaceCapture) {
     return (
@@ -561,14 +636,8 @@ const RemoteAttendanceMainIndex = ({ route }: props) => {
         failureMessage={failureMessage}
         onSuccessDismiss={handleSuccessDismiss}
         onErrorDismiss={handleErrorDismiss}
-        onError={(msg: string) => {
-          setShowFaceCapture(false);
-          toaster.show({
-            message: msg || 'Face detection Failed',
-            type: 'error',
-          });
-        }}
-        onCancel={() => setShowFaceCapture(false)}
+        onError={handleFaceError}
+        onCancel={handleFaceCancel}
       />
     );
   }
@@ -618,18 +687,10 @@ const RemoteAttendanceMainIndex = ({ route }: props) => {
               }}
               style={styles.mapView}
             >
-              <Marker
-                coordinate={{
-                  latitude: location2?.latitude,
-                  longitude: location2?.longitude,
-                }}
-              />
+              <Marker coordinate={mapCoordinate} />
 
               <Circle
-                center={{
-                  latitude: location2?.latitude,
-                  longitude: location2?.longitude,
-                }}
+                center={mapCoordinate}
                 radius={200}
                 strokeWidth={1.5}
                 strokeColor={COLORS.primary}
@@ -728,7 +789,7 @@ const RemoteAttendanceMainIndex = ({ route }: props) => {
       </View>
     </ContainerNew>
   );
-};
+});
 
 export default RemoteAttendanceMainIndex;
 export const remoteAttendenceStyle = StyleSheet.create({
