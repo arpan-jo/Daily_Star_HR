@@ -1,5 +1,6 @@
 import {observer} from 'mobx-react-lite';
 import React, {useState} from 'react';
+import {commonURL} from '../../../../App';
 import {
   Platform,
   ScrollView,
@@ -48,7 +49,7 @@ const DocumentManagementIndex = observer<
       };
     });
     setLeaveTopTab(leaveMenu);
-  }, []);
+  }, [userInfo?.intWorkplaceGroupId]);
 
   const topTabPress = async (index: any) => {
     setIsActive(!isActive);
@@ -85,6 +86,10 @@ const DocumentManagementIndex = observer<
       header={
         <CustomHeader
           onLeftMenuPress={navigation.toggleDrawer}
+          isSubtitleClickable={commonURL === userInfo?.strUrl}
+          subtitle={
+            commonURL === userInfo?.strUrl ? userInfo?.strWorkplaceGroup : ''
+          }
           title="Document Mangement"
         />
       }

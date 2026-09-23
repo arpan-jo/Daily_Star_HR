@@ -88,7 +88,14 @@ const EmployeeDirectoryMainIndex = observer(() => {
       //   getContactData(busId);
       // }
     },
-    [isFocused, isLoad === true, employeeName, currentPage, !isSearch],
+    [
+      isFocused,
+      isLoad === true,
+      employeeName,
+      currentPage,
+      !isSearch,
+      userInfo?.intWorkplaceGroupId,
+    ],
   );
 
   useAsyncEffect(
@@ -536,6 +543,12 @@ const EmployeeDirectoryMainIndex = observer(() => {
                 setIsSearch(!isSearch);
                 LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
               }}
+              isSubtitleClickable={commonURL === userInfo?.strUrl}
+              subtitle={
+                commonURL === userInfo?.strUrl
+                  ? userInfo?.strWorkplaceGroup
+                  : ''
+              }
               title="Employee Directory"
             />
           )}

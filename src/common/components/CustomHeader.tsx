@@ -175,7 +175,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
 
         if (subTitleData?.length) {
           setSelectedBuUnit(subTitleData);
-        } else if (resssForWorkPlace?.Length) {
+        } else if (resssForWorkPlace?.length) {
           const modifiedDataForWorkPlace = resssForWorkPlace?.map(
             (item: any) => {
               return {
@@ -223,7 +223,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
     };
     //@ts-ignore
     userInfoSave(updtedLoginInfo);
-    setRerender(true);
+    setRerender?.(true);
   };
 
   return (
