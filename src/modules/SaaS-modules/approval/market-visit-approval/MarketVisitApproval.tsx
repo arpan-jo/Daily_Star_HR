@@ -1,31 +1,38 @@
-import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
-import React, {useEffect, useState} from 'react';
+import {
+  useIsFocused,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
 import {
   Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
   UIManager,
-  View} from 'react-native';
+  View,
+} from 'react-native';
 import FastImage from 'react-native-fast-image';
-import {Edge} from 'react-native-safe-area-context';
+import { Edge } from 'react-native-safe-area-context';
 import MIcon from 'react-native-vector-icons/MaterialIcons';
-import {commonURL} from '../../../../../App';
+import { commonURL } from '../../../../../App';
 import {
   GetAllPendingApplicationsForApproval,
-  MarketAttendanceLanding} from '../../../../common/api/api';
+  MarketAttendanceLanding,
+} from '../../../../common/api/api';
 import ContainerNew from '../../../../common/components/Container';
 import CustomHeader from '../../../../common/components/CustomHeader';
-import {IMAGES} from '../../../../common/constant/Index';
-import {COLORS} from '../../../../common/constant/Themes';
-import {httpRequest} from '../../../../common/constant/httpRequest';
+import { IMAGES } from '../../../../common/constant/Index';
+import { COLORS } from '../../../../common/constant/Themes';
+import { httpRequest } from '../../../../common/constant/httpRequest';
 import useAsyncEffect from '../../../../common/packages/useAsyncEffect/useAsyncEffect';
-import {date_formater} from '../../../../common/services/dateFormater';
+import { date_formater } from '../../../../common/services/dateFormater';
 import {
   getStatusBgColor,
-  getStatusColor} from '../../../../common/services/getColor';
-import {timeFormaterToPmAm} from '../../../../common/services/timeFormater';
-import {useRootStore} from '../../../../stores/rootStore';
+  getStatusColor,
+} from '../../../../common/services/getColor';
+import { timeFormaterToPmAm } from '../../../../common/services/timeFormater';
+import { useRootStore } from '../../../../stores/rootStore';
 import Row from '../../../../common/components/Row';
 import TopBarItem from '../../../../common/components/TabBaritem';
 import LoadingContainer from '../../../../common/components/Loading';
@@ -55,14 +62,23 @@ const topBarItem = [
 ];
 const MarketVisitApprovalMainIndex = () => {
   const navigation = useNavigation();
-  const {userInfo} = useRootStore();
+  const { userInfo } = useRootStore();
   const route = useRoute();
   const [isLoading, setIsLoading] = useState(false);
   const isFocused = useIsFocused();
   const [isSearch, _setIsSearch] = useState(true);
   const [isShowHeader, _setIsShowHeader] = useState(true);
-  const [topBar, setTopBar] = useState(topBarItem);
-  const [activeTabName, setActiveTabName] = useState('commonApproval');
+  // Opens on the tab the approval dashboard was on, so the list matches the
+  // count that was tapped; the tabs below still switch it from here.
+  const initialTabName =
+    (route?.params as any)?.activeTabName || 'commonApproval';
+  const [topBar, setTopBar] = useState(() =>
+    topBarItem.map(tab => ({
+      ...tab,
+      isActive: tab?.nameForApi === initialTabName,
+    })),
+  );
+  const [activeTabName, setActiveTabName] = useState(initialTabName);
   const [remoteAttendance, setRemoteAttendance] = useState<any[]>();
 
   //@ts-ignore
@@ -116,7 +132,7 @@ const MarketVisitApprovalMainIndex = () => {
       // setRemoteAttendance(res);
       getLandingDataApi();
     },
-    [isFocused, userInfo],
+    [isFocused, userInfo, activeTabName],
   );
   const getLandingDataApi = async () => {
     const api_params = {
@@ -132,6 +148,7 @@ const MarketVisitApprovalMainIndex = () => {
               //@ts-ignore
               applicationTypeId: marketVisitData?.applicationTypeId,
               employeeId: userInfo?.intEmployeeId,
+              isAdmin: activeTabName === 'adminApproval' ? true : false,
               // for common new approval api  v2
             }
           : payload,
@@ -244,7 +261,8 @@ const MarketVisitApprovalMainIndex = () => {
           )}
         </>
       }
-      style={styles.container}>
+      style={styles.container}
+    >
       <View>
         <LoadingContainer isLoading={isLoading} />
         {userInfo?.strUrl === commonURL && (
@@ -272,7 +290,8 @@ const MarketVisitApprovalMainIndex = () => {
                 attDetails: item,
                 activeTabName: activeTabName,
               });
-            }}>
+            }}
+          >
             <View style={styles.card}>
               <View>
                 <View style={styles.noImageBox}>
@@ -302,7 +321,8 @@ const MarketVisitApprovalMainIndex = () => {
                           color: getStatusColor(item?.status),
                           backgroundColor: getStatusBgColor(item?.status),
                         },
-                      ]}>
+                      ]}
+                    >
                       {item?.status}
                     </Text>
                   </View>
@@ -375,7 +395,7 @@ const styles = StyleSheet.create({
     elevation: 3,
     backgroundColor: COLORS.white,
     shadowColor: COLORS.black,
-    shadowOffset: {width: 0, height: 0},
+    shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
     paddingVertical: 16,
@@ -450,7 +470,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-start',
   },
-  image: {width: 130, height: 90},
+  image: { width: 130, height: 90 },
   noDataText: {
     textAlign: 'center',
     color: COLORS.textNewColor,

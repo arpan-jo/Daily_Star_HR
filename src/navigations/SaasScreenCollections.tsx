@@ -5,240 +5,162 @@ const AllApplicationFromDash = lazy(
 );
 const AttendanceAdjustmentDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/application/attendance-adjustment/AttendanceAdjustmentDetails'
-    ),
+    import('../modules/SaaS-modules/application/attendance-adjustment/AttendanceAdjustmentDetails'),
 );
 const AttendanceAdjustmentMainIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/application/attendance-adjustment/AttendanceAdjustmentMainIndex'
-    ),
+    import('../modules/SaaS-modules/application/attendance-adjustment/AttendanceAdjustmentMainIndex'),
 );
 const CreateAttendanceAdjustment = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/application/attendance-adjustment/CreateAttendanceAdjustment'
-    ),
+    import('../modules/SaaS-modules/application/attendance-adjustment/CreateAttendanceAdjustment'),
 );
 const AddExpense = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/application/expense-application/AddExpense'
-    ),
+    import('../modules/SaaS-modules/application/expense-application/AddExpense'),
 );
 const CreateEditExpenseApplication = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/application/expense-application/CreateEditExpenseApplication'
-    ),
+    import('../modules/SaaS-modules/application/expense-application/CreateEditExpenseApplication'),
 );
 const EmployeeSelect = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/application/expense-application/EmployeeSelect'
-    ),
+    import('../modules/SaaS-modules/application/expense-application/EmployeeSelect'),
 );
 const ExpenseApplicationMainIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/application/expense-application/ExpenseApplicationMainIndex'
-    ),
+    import('../modules/SaaS-modules/application/expense-application/ExpenseApplicationMainIndex'),
 );
 const ExpenseBillDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/application/expense-application/ExpenseBillDetails'
-    ),
+    import('../modules/SaaS-modules/application/expense-application/ExpenseBillDetails'),
 );
 const ExpenseDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/application/expense-application/ExpenseDetails'
-    ),
+    import('../modules/SaaS-modules/application/expense-application/ExpenseDetails'),
 );
 const CreateEditIOUApplication = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/application/iou-application/CreateEditIOUApplication'
-    ),
+    import('../modules/SaaS-modules/application/iou-application/CreateEditIOUApplication'),
 );
 const IOUApplicationDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/application/iou-application/IOUApplicationDetails'
-    ),
+    import('../modules/SaaS-modules/application/iou-application/IOUApplicationDetails'),
 );
 const IOUApplicationMainIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/application/iou-application/IOUApplicationMain'
-    ),
+    import('../modules/SaaS-modules/application/iou-application/IOUApplicationMain'),
 );
 const CreateEditLeaveApplication = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/application/leave-application/CreateEditLeaveApplication'
-    ),
+    import('../modules/SaaS-modules/application/leave-application/CreateEditLeaveApplication'),
 );
 const LeaveApplicationDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/application/leave-application/LeaveApplicationDetails'
-    ),
+    import('../modules/SaaS-modules/application/leave-application/LeaveApplicationDetails'),
 );
 const LeaveApplicationMainIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/application/leave-application/LeaveApplicationMainIndex'
-    ),
+    import('../modules/SaaS-modules/application/leave-application/LeaveApplicationMainIndex'),
 );
 const CreateEditLoanApplication = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/application/loan-application/CreateEditLoanApplication'
-    ),
+    import('../modules/SaaS-modules/application/loan-application/CreateEditLoanApplication'),
 );
 const LoanApplicationDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/application/loan-application/LoanApplicationDetails'
-    ),
+    import('../modules/SaaS-modules/application/loan-application/LoanApplicationDetails'),
 );
 const LoanApplicationMainIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/application/loan-application/LoanApplicationMainIndex'
-    ),
+    import('../modules/SaaS-modules/application/loan-application/LoanApplicationMainIndex'),
 );
 const AddLocationIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/application/location-&-device/AddLocationIndex'
-    ),
+    import('../modules/SaaS-modules/application/location-&-device/AddLocationIndex'),
 );
 const LocationAndDeviceMainIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/application/location-&-device/LocationAndDeviceMainIndex'
-    ),
+    import('../modules/SaaS-modules/application/location-&-device/LocationAndDeviceMainIndex'),
 );
 const LocationDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/application/location-&-device/LocationDetails'
-    ),
+    import('../modules/SaaS-modules/application/location-&-device/LocationDetails'),
 );
 const CreateEditNewLocationAssign = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/application/location-assign/CreateEditNewLocationAssign'
-    ),
+    import('../modules/SaaS-modules/application/location-assign/CreateEditNewLocationAssign'),
 );
 const LocationAssignMainIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/application/location-assign/LocationAssignMainIndex'
-    ),
+    import('../modules/SaaS-modules/application/location-assign/LocationAssignMainIndex'),
 );
 const MarketVisitMainIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/application/market-visit/MarketVisitMainIndex'
-    ),
+    import('../modules/SaaS-modules/application/market-visit/MarketVisitMainIndex'),
 );
 const CreateEditMovementApplication = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/application/movement-application/CreateEditMovementApplication'
-    ),
+    import('../modules/SaaS-modules/application/movement-application/CreateEditMovementApplication'),
 );
 const MovementApplicationDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/application/movement-application/MovementApplicationDetails'
-    ),
+    import('../modules/SaaS-modules/application/movement-application/MovementApplicationDetails'),
 );
 const MovementApplicationMainIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/application/movement-application/MovementApplicationMainIndex'
-    ),
+    import('../modules/SaaS-modules/application/movement-application/MovementApplicationMainIndex'),
 );
 const OvertimeApplicationDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/application/overtime-application/OvertimeApplicationDetails'
-    ),
+    import('../modules/SaaS-modules/application/overtime-application/OvertimeApplicationDetails'),
 );
 const CreateEditOvertimeApplication = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/application/overtime-application/CreateEditOvertimeApplication'
-    ),
+    import('../modules/SaaS-modules/application/overtime-application/CreateEditOvertimeApplication'),
 );
 const OvertimeApplicationMainIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/application/overtime-application/OvertimeApplicationMainIndex'
-    ),
+    import('../modules/SaaS-modules/application/overtime-application/OvertimeApplicationMainIndex'),
 );
 const RemoteAttendanceMainIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/application/remote-attendance/RemoteAttendanceMainIndex'
-    ),
+    import('../modules/SaaS-modules/application/remote-attendance/RemoteAttendanceMainIndex'),
 );
 const ApprovalMainIndexFromSupDash = lazy(
   () => import('../modules/SaaS-modules/approval/ApprovalMainIndexFromSupDash'),
 );
 const AssignedLocationApprovalMain = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/assigned-location-approval/AssignedLocationApproval'
-    ),
+    import('../modules/SaaS-modules/approval/assigned-location-approval/AssignedLocationApproval'),
 );
 const AssignedLocationApprovalDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/assigned-location-approval/AssignedLocationApprovalDetails'
-    ),
+    import('../modules/SaaS-modules/approval/assigned-location-approval/AssignedLocationApprovalDetails'),
 );
 const AttendanceAdjustmentApprovalDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/attendance-adjustment-approval/AttendanceAdjustmentApprovalDetails'
-    ),
+    import('../modules/SaaS-modules/approval/attendance-adjustment-approval/AttendanceAdjustmentApprovalDetails'),
 );
 const AttendanceAdjustmentApprovalMainIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/attendance-adjustment-approval/AttendanceAdjustmentApprovalMainIndex'
-    ),
+    import('../modules/SaaS-modules/approval/attendance-adjustment-approval/AttendanceAdjustmentApprovalMainIndex'),
 );
 const ExpenseApprovalDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/expense-approval/ExpenseApprovalDetails'
-    ),
+    import('../modules/SaaS-modules/approval/expense-approval/ExpenseApprovalDetails'),
 );
 const ExpenseApprovalMainIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/expense-approval/ExpenseApprovalMainIndex'
-    ),
+    import('../modules/SaaS-modules/approval/expense-approval/ExpenseApprovalMainIndex'),
 );
 const IOUAdjustmentApprovalDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/iou-adjustment-approval/IOUAdjustmentApprovalDetails'
-    ),
+    import('../modules/SaaS-modules/approval/iou-adjustment-approval/IOUAdjustmentApprovalDetails'),
 );
 const IOUAdjustmentApprovalMainIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/iou-adjustment-approval/IOUAdjustmentMainIndex'
-    ),
+    import('../modules/SaaS-modules/approval/iou-adjustment-approval/IOUAdjustmentMainIndex'),
 );
 const IOUApprovalDetails = lazy(
   () =>
@@ -246,240 +168,162 @@ const IOUApprovalDetails = lazy(
 );
 const IOUApprovalMainIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/iou-approval/IOUApprovalMainIndex'
-    ),
+    import('../modules/SaaS-modules/approval/iou-approval/IOUApprovalMainIndex'),
 );
 const LeaveNewApprovalDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/leave-approval/LeaveApprovalDetials'
-    ),
+    import('../modules/SaaS-modules/approval/leave-approval/LeaveApprovalDetials'),
 );
 const LeaveApprovalMainIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/leave-approval/LeaveApprovalMainIndex'
-    ),
+    import('../modules/SaaS-modules/approval/leave-approval/LeaveApprovalMainIndex'),
 );
 const LoanApprovalDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/loan-approval/LoanApprovalDetails'
-    ),
+    import('../modules/SaaS-modules/approval/loan-approval/LoanApprovalDetails'),
 );
 const LoanApprovalMainIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/loan-approval/LoanApprovalMainIndex'
-    ),
+    import('../modules/SaaS-modules/approval/loan-approval/LoanApprovalMainIndex'),
 );
 const LocationAndDeviceApprovalDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/location-device-approval/LocationAndDeviceApprovalDetails'
-    ),
+    import('../modules/SaaS-modules/approval/location-device-approval/LocationAndDeviceApprovalDetails'),
 );
 const LocationAndDeviceApprovalMainIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/location-device-approval/LocatonAndDeviceApprovalMainIndex'
-    ),
+    import('../modules/SaaS-modules/approval/location-device-approval/LocatonAndDeviceApprovalMainIndex'),
 );
 const MarketVisitApprovalMainIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/market-visit-approval/MarketVisitApproval'
-    ),
+    import('../modules/SaaS-modules/approval/market-visit-approval/MarketVisitApproval'),
 );
 const MarketVisitApprovalDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/market-visit-approval/MarketVisitApprovalDetails'
-    ),
+    import('../modules/SaaS-modules/approval/market-visit-approval/MarketVisitApprovalDetails'),
 );
 const MovementApprovalMainIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/movement-approval/MovementApprovalMainIndex'
-    ),
+    import('../modules/SaaS-modules/approval/movement-approval/MovementApprovalMainIndex'),
 );
 const MovementNewApprovalDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/movement-approval/MovementNewApprovalDetails'
-    ),
+    import('../modules/SaaS-modules/approval/movement-approval/MovementNewApprovalDetails'),
 );
 const OvertimeApprovalDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/overtime-approval/OvertimeApprovalDetails'
-    ),
+    import('../modules/SaaS-modules/approval/overtime-approval/OvertimeApprovalDetails'),
 );
 const OvertimeApprovalMainIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/overtime-approval/OvertimeApprovalMainIndex'
-    ),
+    import('../modules/SaaS-modules/approval/overtime-approval/OvertimeApprovalMainIndex'),
 );
 const RemoteAttendanceApprovalDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/remote-attendance-approval/RemoteAttendanceApprovalDetails'
-    ),
+    import('../modules/SaaS-modules/approval/remote-attendance-approval/RemoteAttendanceApprovalDetails'),
 );
 const RemoteAttendanceApprovalMainIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/remote-attendance-approval/RemoteAttendanceApprovalMainIndex'
-    ),
+    import('../modules/SaaS-modules/approval/remote-attendance-approval/RemoteAttendanceApprovalMainIndex'),
 );
 
 const AttendanceDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/dashboard/employeeDashboard/AttendanceDetails'
-    ),
+    import('../modules/SaaS-modules/dashboard/employeeDashboard/AttendanceDetails'),
 );
 const BehaviorLibrayIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/dashboard/employeeDashboard/Behavior-Libray/BehaviorLibrayIndex'
-    ),
+    import('../modules/SaaS-modules/dashboard/employeeDashboard/Behavior-Libray/BehaviorLibrayIndex'),
 );
 const CoreValuesDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/dashboard/employeeDashboard/Behavior-Libray/CoreValuesDetails'
-    ),
+    import('../modules/SaaS-modules/dashboard/employeeDashboard/Behavior-Libray/CoreValuesDetails'),
 );
 const BusinessGoalIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/dashboard/employeeDashboard/BusinessGoal/BusinessGoalIndex'
-    ),
+    import('../modules/SaaS-modules/dashboard/employeeDashboard/BusinessGoal/BusinessGoalIndex'),
 );
 const AddedCompentency = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/dashboard/employeeDashboard/Competency/AddedCompentency'
-    ),
+    import('../modules/SaaS-modules/dashboard/employeeDashboard/Competency/AddedCompentency'),
 );
 const CompetencyCreate = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/dashboard/employeeDashboard/Competency/CompetencyCreate'
-    ),
+    import('../modules/SaaS-modules/dashboard/employeeDashboard/Competency/CompetencyCreate'),
 );
 const CompetencyEdit = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/dashboard/employeeDashboard/Competency/CompetencyEdit'
-    ),
+    import('../modules/SaaS-modules/dashboard/employeeDashboard/Competency/CompetencyEdit'),
 );
 const CompetencyIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/dashboard/employeeDashboard/Competency/CompetencyIndex'
-    ),
+    import('../modules/SaaS-modules/dashboard/employeeDashboard/Competency/CompetencyIndex'),
 );
 const CopetencyDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/dashboard/employeeDashboard/Competency/CopetencyDetails'
-    ),
+    import('../modules/SaaS-modules/dashboard/employeeDashboard/Competency/CopetencyDetails'),
 );
 const EmployeeAddEditSkill = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/dashboard/employeeDashboard/EmployeeAddEditSkill'
-    ),
+    import('../modules/SaaS-modules/dashboard/employeeDashboard/EmployeeAddEditSkill'),
 );
 const EmployeeAddLink = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/dashboard/employeeDashboard/EmployeeAddLink'
-    ),
+    import('../modules/SaaS-modules/dashboard/employeeDashboard/EmployeeAddLink'),
 );
 const EmpolyeeSelfDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/dashboard/employeeDashboard/EmpolyeeSelfDetails'
-    ),
+    import('../modules/SaaS-modules/dashboard/employeeDashboard/EmpolyeeSelfDetails'),
 );
 const EmpolyeeSkills = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/dashboard/employeeDashboard/EmpolyeeSkills'
-    ),
+    import('../modules/SaaS-modules/dashboard/employeeDashboard/EmpolyeeSkills'),
 );
 
 const InternalReferenceLanding = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/dashboard/employeeDashboard/internal-reference-reward/internalReferenceLanding'
-    ),
+    import('../modules/SaaS-modules/dashboard/employeeDashboard/internal-reference-reward/internalReferenceLanding'),
 );
 const MakeCustomerIR = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/dashboard/employeeDashboard/internal-reference-reward/MakeCustomerIR'
-    ),
+    import('../modules/SaaS-modules/dashboard/employeeDashboard/internal-reference-reward/MakeCustomerIR'),
 );
 const JobDescriptionDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/dashboard/employeeDashboard/JobDescription/JobDescriptionDetails'
-    ),
+    import('../modules/SaaS-modules/dashboard/employeeDashboard/JobDescription/JobDescriptionDetails'),
 );
 const JobDescriptionIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/dashboard/employeeDashboard/JobDescription/JobDescriptionIndex'
-    ),
+    import('../modules/SaaS-modules/dashboard/employeeDashboard/JobDescription/JobDescriptionIndex'),
 );
 const JobDescriptitonMatrix = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/dashboard/employeeDashboard/JobDescription/JobDescriptionMatrix'
-    ),
+    import('../modules/SaaS-modules/dashboard/employeeDashboard/JobDescription/JobDescriptionMatrix'),
 );
 const ReportJobDescription = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/dashboard/employeeDashboard/JobDescription/ReportJobDescription'
-    ),
+    import('../modules/SaaS-modules/dashboard/employeeDashboard/JobDescription/ReportJobDescription'),
 );
 
 const MyTaskDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/dashboard/employeeDashboard/MyTasks/MyTaskDetails'
-    ),
+    import('../modules/SaaS-modules/dashboard/employeeDashboard/MyTasks/MyTaskDetails'),
 );
 const MyTasksIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/dashboard/employeeDashboard/MyTasks/MyTasksIndex'
-    ),
+    import('../modules/SaaS-modules/dashboard/employeeDashboard/MyTasks/MyTasksIndex'),
 );
 const PolicyBusinessTaskIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/dashboard/employeeDashboard/MyTasks/PolicyBusinessTaskIndex'
-    ),
+    import('../modules/SaaS-modules/dashboard/employeeDashboard/MyTasks/PolicyBusinessTaskIndex'),
 );
 const SopBusinessTaskIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/dashboard/employeeDashboard/MyTasks/SopBusinessTaskIndex'
-    ),
+    import('../modules/SaaS-modules/dashboard/employeeDashboard/MyTasks/SopBusinessTaskIndex'),
 );
 const WorkflowBusinessTaskIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/dashboard/employeeDashboard/MyTasks/WorkflowBusinessTaskIndex'
-    ),
+    import('../modules/SaaS-modules/dashboard/employeeDashboard/MyTasks/WorkflowBusinessTaskIndex'),
 );
 const NoticeDetails = lazy(
   () =>
@@ -488,9 +332,7 @@ const NoticeDetails = lazy(
 
 const PayslipDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/dashboard/employeeDashboard/PayslipDetails'
-    ),
+    import('../modules/SaaS-modules/dashboard/employeeDashboard/PayslipDetails'),
 );
 
 const EmployeeSalary = lazy(
@@ -499,57 +341,39 @@ const EmployeeSalary = lazy(
 );
 const AllEmloyeeSupervisor = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/dashboard/supervisorDashboard/AllEmloyeeSupervisor'
-    ),
+    import('../modules/SaaS-modules/dashboard/supervisorDashboard/AllEmloyeeSupervisor'),
 );
 const DocRouteCreate = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/document-management/doc-routing/docRouteCreate'
-    ),
+    import('../modules/SaaS-modules/document-management/doc-routing/docRouteCreate'),
 );
 const DocRouteDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/document-management/doc-routing/docRouteDetails'
-    ),
+    import('../modules/SaaS-modules/document-management/doc-routing/docRouteDetails'),
 );
 const DocDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/document-management/docApplication/docDetails'
-    ),
+    import('../modules/SaaS-modules/document-management/docApplication/docDetails'),
 );
 const DocUpload = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/document-management/docApplication/docUpload'
-    ),
+    import('../modules/SaaS-modules/document-management/docApplication/docUpload'),
 );
 const DocUploadFile = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/document-management/docApplication/docUploadFile'
-    ),
+    import('../modules/SaaS-modules/document-management/docApplication/docUploadFile'),
 );
 const SendOrApproval = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/document-management/docApplication/sendOrApproval'
-    ),
+    import('../modules/SaaS-modules/document-management/docApplication/sendOrApproval'),
 );
 const EmployeeDirectoryDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/employee-directory/EmployeeDirectoryDetails'
-    ),
+    import('../modules/SaaS-modules/employee-directory/EmployeeDirectoryDetails'),
 );
 const EmployeeDirectoryFromHome = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/employee-directory/EmployeeDirectoryFromHome'
-    ),
+    import('../modules/SaaS-modules/employee-directory/EmployeeDirectoryFromHome'),
 );
 const SendMsgToEmployee = lazy(
   () => import('../modules/SaaS-modules/employee-directory/SendMsgToEmployee'),
@@ -562,39 +386,35 @@ const NotificationIndex = lazy(
 );
 const IncrementApprovalMainIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/increment-approval/IncrementApprovalMainIndex'
-    ),
+    import('../modules/SaaS-modules/approval/increment-approval/IncrementApprovalMainIndex'),
 );
 const IncrementApprovalDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/increment-approval/IncrementApprovalDetails'
-    ),
+    import('../modules/SaaS-modules/approval/increment-approval/IncrementApprovalDetails'),
+);
+const CommonApprovalMainIndex = lazy(
+  () =>
+    import('../modules/SaaS-modules/approval/common-approval/CommonApprovalMainIndex'),
+);
+const CommonApprovalDetails = lazy(
+  () =>
+    import('../modules/SaaS-modules/approval/common-approval/CommonApprovalDetails'),
 );
 const SalaryGenerateApprovalMainIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/salary-generate-approval/SalaryGenerateApprovalMainIndex'
-    ),
+    import('../modules/SaaS-modules/approval/salary-generate-approval/SalaryGenerateApprovalMainIndex'),
 );
 const SalaryGenerateApprovalDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/salary-generate-approval/SalaryGenerateApprovalDetails'
-    ),
+    import('../modules/SaaS-modules/approval/salary-generate-approval/SalaryGenerateApprovalDetails'),
 );
 const AdvanceExpenseApprovalMainIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/advance-expenxe-approval/AdvanceExpApprovalMainIndex'
-    ),
+    import('../modules/SaaS-modules/approval/advance-expenxe-approval/AdvanceExpApprovalMainIndex'),
 );
 const AdvanceExpenseApprovalDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/advance-expenxe-approval/AdvanceExpenseApprovalDetails'
-    ),
+    import('../modules/SaaS-modules/approval/advance-expenxe-approval/AdvanceExpenseApprovalDetails'),
 );
 const IssueMainIndex = lazy(
   () => import('../modules/SaaS-modules/application/issue/IssueMainIndex'),
@@ -607,39 +427,27 @@ const IssueDetails = lazy(
 );
 const CreateEditForCommon = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/application/leave-application/CreateEditForCommon'
-    ),
+    import('../modules/SaaS-modules/application/leave-application/CreateEditForCommon'),
 );
 const BomApprovalMainIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/bom-approval/BomApprovalMainIndex'
-    ),
+    import('../modules/SaaS-modules/approval/bom-approval/BomApprovalMainIndex'),
 );
 const LcCostSheetApprovalMainIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/lc-costsheet-approval/LcCostSheetApprovalMainIndex'
-    ),
+    import('../modules/SaaS-modules/approval/lc-costsheet-approval/LcCostSheetApprovalMainIndex'),
 );
 const LcShipmentView = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/lc-costsheet-approval/LcShipmentView'
-    ),
+    import('../modules/SaaS-modules/approval/lc-costsheet-approval/LcShipmentView'),
 );
 const InventoryLoanApprovalMainIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/inventory-loan-approval/InventoryLoanApprovalMainIndex'
-    ),
+    import('../modules/SaaS-modules/approval/inventory-loan-approval/InventoryLoanApprovalMainIndex'),
 );
 const FundRequestApprovalMainIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/fund-request-approval/FundRequestApprovalMainIndex'
-    ),
+    import('../modules/SaaS-modules/approval/fund-request-approval/FundRequestApprovalMainIndex'),
 );
 const GrievanceMainIndex = lazy(
   () =>
@@ -650,53 +458,37 @@ const GrievanceCreate = lazy(
 );
 const InventoryAdjustApprovalMainIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/inventory-adjust-approval/InventoryAdjustApprovalMainIndex'
-    ),
+    import('../modules/SaaS-modules/approval/inventory-adjust-approval/InventoryAdjustApprovalMainIndex'),
 );
 const InventoryAdjustApprovalDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/inventory-adjust-approval/InventoryAdjustApprovalDetails'
-    ),
+    import('../modules/SaaS-modules/approval/inventory-adjust-approval/InventoryAdjustApprovalDetails'),
 );
 const PartnerApprovalMainIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/partner-approval/PartnerApprovalMainIndex'
-    ),
+    import('../modules/SaaS-modules/approval/partner-approval/PartnerApprovalMainIndex'),
 );
 
 const CustomerPreAssesmentApprovalMainIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/customer-pre-assesment-approval/CustomerPreAssesmentApprovalMainIndex'
-    ),
+    import('../modules/SaaS-modules/approval/customer-pre-assesment-approval/CustomerPreAssesmentApprovalMainIndex'),
 );
 const CustomerPreAssessmentApprovalDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/customer-pre-assesment-approval/CustomerPreAssesmentApprovalDetails'
-    ),
+    import('../modules/SaaS-modules/approval/customer-pre-assesment-approval/CustomerPreAssesmentApprovalDetails'),
 );
 const SalesForceAssesmentApprovalMainIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/approval/sales-force-assesment-approval/SalesForceAssesmentApprovalMainIndex'
-    ),
+    import('../modules/SaaS-modules/approval/sales-force-assesment-approval/SalesForceAssesmentApprovalMainIndex'),
 );
 
 const FaceRegistrationIndex = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/application/location-&-device/FaceRegistratioIndex'
-    ),
+    import('../modules/SaaS-modules/application/location-&-device/FaceRegistratioIndex'),
 );
 const RegLocationDetails = lazy(
   () =>
-    import(
-      '../modules/SaaS-modules/application/location-&-device/LocationDetails'
-    ),
+    import('../modules/SaaS-modules/application/location-&-device/LocationDetails'),
 );
 
 export const saasModuleStack = [
@@ -866,6 +658,8 @@ export const saasModuleStack = [
   { name: 'NotificationIndex', component: NotificationIndex },
   { name: 'IncrementApprovalMainIndex', component: IncrementApprovalMainIndex },
   { name: 'IncrementApprovalDetails', component: IncrementApprovalDetails },
+  { name: 'CommonApprovalMainIndex', component: CommonApprovalMainIndex },
+  { name: 'CommonApprovalDetails', component: CommonApprovalDetails },
   {
     name: 'SalaryGenerateApprovalMainIndex',
     component: SalaryGenerateApprovalMainIndex,

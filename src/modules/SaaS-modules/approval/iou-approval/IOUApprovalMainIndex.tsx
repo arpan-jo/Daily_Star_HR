@@ -1,6 +1,10 @@
 import CheckBox from '@react-native-community/checkbox';
-import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
-import React, {useEffect, useState} from 'react';
+import {
+  useIsFocused,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
 import {
   LayoutAnimation,
   Platform,
@@ -8,35 +12,37 @@ import {
   Text,
   TouchableOpacity,
   UIManager,
-  View} from 'react-native';
+  View,
+} from 'react-native';
 import FastImage from 'react-native-fast-image';
-import {Edge} from 'react-native-safe-area-context';
+import { Edge } from 'react-native-safe-area-context';
 import MIcon from 'react-native-vector-icons/MaterialIcons';
-import {commonURL} from '../../../../../App';
+import { commonURL } from '../../../../../App';
 import {
   ApproveApplications,
   GetAllPendingApplicationsForApproval,
-  IOUApplicationLanding} from '../../../../common/api/api';
+  IOUApplicationLanding,
+} from '../../../../common/api/api';
 import ContainerNew from '../../../../common/components/Container';
 import CustomHeader from '../../../../common/components/CustomHeader';
 import CustomModalNew from '../../../../common/components/CustomModal';
-import {useToast} from '../../../../common/components/CustomToast';
+import { useToast } from '../../../../common/components/CustomToast';
 import SearchHeader from '../../../../common/components/SearchHeader';
-import {IMAGES} from '../../../../common/constant/Index';
-import {COLORS} from '../../../../common/constant/Themes';
-import {httpRequest} from '../../../../common/constant/httpRequest';
+import { IMAGES } from '../../../../common/constant/Index';
+import { COLORS } from '../../../../common/constant/Themes';
+import { httpRequest } from '../../../../common/constant/httpRequest';
 import useAsyncEffect from '../../../../common/packages/useAsyncEffect/useAsyncEffect';
-import {date_formater} from '../../../../common/services/dateFormater';
+import { date_formater } from '../../../../common/services/dateFormater';
 import {
   getStatusBgColor,
-  getStatusColor} from '../../../../common/services/getColor';
-import {IOUApprvalLandingListDataEntity} from '../../../../interfaces/iou/iou';
-import {IOUApplicationApproval} from '../../../../services/SaaS-modules/iou/ios';
-import {useRootStore} from '../../../../stores/rootStore';
+  getStatusColor,
+} from '../../../../common/services/getColor';
+import { IOUApprvalLandingListDataEntity } from '../../../../interfaces/iou/iou';
+import { IOUApplicationApproval } from '../../../../services/SaaS-modules/iou/ios';
+import { useRootStore } from '../../../../stores/rootStore';
 import Row from '../../../../common/components/Row';
 import TopBarItem from '../../../../common/components/TabBaritem';
 import LoadingContainer from '../../../../common/components/Loading';
-
 
 const edges1: Edge[] = ['right', 'bottom', 'left', 'top'];
 const edges2: Edge[] = ['right', 'bottom', 'left'];
@@ -64,7 +70,7 @@ const topBarItem = [
 const IOUApprovalMainIndex = () => {
   const toaster = useToast();
   const navigation = useNavigation();
-  const {userInfo} = useRootStore();
+  const { userInfo } = useRootStore();
   const [isLoading, setIsLoading] = useState(false);
   const isFocused = useIsFocused();
   const [isSearch, setIsSearch] = useState(true);
@@ -73,11 +79,20 @@ const IOUApprovalMainIndex = () => {
   const [isModalShow, setIsModalShow] = useState(false);
   const [isModalShow2, setIsModalShow2] = useState(false);
   const [isSelectAll, setIsSelectAll] = useState(false);
-  const [topBar, setTopBar] = useState(topBarItem);
-  const [activeTabName, setActiveTabName] = useState('commonApproval');
   const route = useRoute();
   //@ts-ignore
   const iouApprovalData = route?.params;
+  // Opens on the tab the approval dashboard was on, so the list matches the
+  // count that was tapped; the tabs below still switch it from here.
+  const initialTabName =
+    (route?.params as any)?.activeTabName || 'commonApproval';
+  const [topBar, setTopBar] = useState(() =>
+    topBarItem.map(tab => ({
+      ...tab,
+      isActive: tab?.nameForApi === initialTabName,
+    })),
+  );
+  const [activeTabName, setActiveTabName] = useState(initialTabName);
 
   const [IOUApprovalLandingData, setIOUApprovalLandingData] =
     useState<IOUApprvalLandingListDataEntity[]>();
@@ -150,7 +165,7 @@ const IOUApprovalMainIndex = () => {
       //   });
       // setIOUApprovalLandingData(data);
     },
-    [userInfo, isFocused],
+    [userInfo, isFocused, topBar],
   );
 
   useAsyncEffect(
@@ -185,7 +200,7 @@ const IOUApprovalMainIndex = () => {
         }
       }
     },
-    [employeeName],
+    [employeeName, topBar],
   );
 
   const isTrueSingleClick = IOUApprovalLandingData?.filter(
@@ -273,7 +288,7 @@ const IOUApprovalMainIndex = () => {
       } else {
         const res = await IOUApplicationApproval(payloadForApproveOrReject);
         if (res) {
-          toaster.show({message: res?.data, type: 'success'});
+          toaster.show({ message: res?.data, type: 'success' });
           allDeactive();
         }
       }
@@ -306,7 +321,7 @@ const IOUApprovalMainIndex = () => {
       } else {
         const res = await IOUApplicationApproval(payloadForApproveOrReject);
         if (res) {
-          toaster.show({message: res?.data, type: 'success'});
+          toaster.show({ message: res?.data, type: 'success' });
           allDeactive();
         }
       }
@@ -498,7 +513,8 @@ const IOUApprovalMainIndex = () => {
           )}
         </>
       }
-      style={styles.container}>
+      style={styles.container}
+    >
       <LoadingContainer isLoading={isLoading} />
       {userInfo?.strUrl === commonURL && (
         <>
@@ -532,7 +548,7 @@ const IOUApprovalMainIndex = () => {
               value={isSelectAll}
               onValueChange={AllActiveDeactiveHandler}
               style={styles.checkbox}
-              tintColors={{true: 'white', false: 'white'}}
+              tintColors={{ true: 'white', false: 'white' }}
               tintColor={COLORS.white}
               onCheckColor={COLORS.white}
               onTintColor={COLORS.white}
@@ -543,13 +559,15 @@ const IOUApprovalMainIndex = () => {
           <View style={styles.approvehead}>
             <TouchableOpacity
               onPress={() => setIsModalShow2(true)}
-              style={styles.approveOrReject}>
+              style={styles.approveOrReject}
+            >
               <Text style={styles.rejectApproveText}>Reject</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={() => setIsModalShow(true)}
-              style={[styles.approveOrReject, styles.marginLeft]}>
+              style={[styles.approveOrReject, styles.marginLeft]}
+            >
               <Text style={styles.rejectApproveText}>Approve</Text>
             </TouchableOpacity>
           </View>
@@ -559,7 +577,8 @@ const IOUApprovalMainIndex = () => {
         style={[
           isSearch ? styles.isSearchTrue : styles.isSearchFalse,
           styles.horizontalPad,
-        ]}>
+        ]}
+      >
         {IOUApprovalLandingData &&
           IOUApprovalLandingData?.map((data, index) => (
             <TouchableOpacity
@@ -586,7 +605,8 @@ const IOUApprovalMainIndex = () => {
                     ? COLORS.lightPrimary2
                     : COLORS.white,
                 },
-              ]}>
+              ]}
+            >
               <View>
                 <View style={styles.noImageBox}>
                   <FastImage source={IMAGES.NoImage} style={styles.noImage} />
@@ -597,7 +617,8 @@ const IOUApprovalMainIndex = () => {
                   styles.txtPart,
 
                   data?.isActive ? styles.isActiveTrue : styles.isActiveFalse,
-                ]}>
+                ]}
+              >
                 <View style={styles.rowSpaceBetween}>
                   <Text style={styles.empName}>{data?.employeeName}</Text>
                 </View>
@@ -630,7 +651,8 @@ const IOUApprovalMainIndex = () => {
                             data?.application?.strStatus,
                           ),
                         },
-                      ]}>
+                      ]}
+                    >
                       {data?.application?.strStatus}
                     </Text>
                   </View>
@@ -693,7 +715,7 @@ const styles = StyleSheet.create({
     elevation: 3,
     backgroundColor: COLORS.white,
     shadowColor: COLORS.black,
-    shadowOffset: {width: 0, height: 0},
+    shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
     paddingVertical: 16,
@@ -805,12 +827,12 @@ const styles = StyleSheet.create({
   marginLeft: {
     marginLeft: 8,
   },
-  approvehead: {flexDirection: 'row'},
-  horizontalPad: {paddingHorizontal: 16},
-  isSearchTrue: {marginTop: 0},
-  isSearchFalse: {marginTop: 90},
-  isActiveTrue: {paddingLeft: 8},
-  isActiveFalse: {paddingLeft: 16},
+  approvehead: { flexDirection: 'row' },
+  horizontalPad: { paddingHorizontal: 16 },
+  isSearchTrue: { marginTop: 0 },
+  isSearchFalse: { marginTop: 90 },
+  isActiveTrue: { paddingLeft: 8 },
+  isActiveFalse: { paddingLeft: 16 },
   checkboxContainer: {
     flexDirection: 'row',
     marginBottom: 0,

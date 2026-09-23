@@ -1,6 +1,10 @@
 import CheckBox from '@react-native-community/checkbox';
-import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
-import React, {useEffect, useState} from 'react';
+import {
+  useIsFocused,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
 import {
   FlatList,
   ListRenderItemInfo,
@@ -9,36 +13,41 @@ import {
   Text,
   TouchableOpacity,
   UIManager,
-  View} from 'react-native';
+  View,
+} from 'react-native';
 import FastImage from 'react-native-fast-image';
-import {Edge} from 'react-native-safe-area-context';
+import { Edge } from 'react-native-safe-area-context';
 import MIcon from 'react-native-vector-icons/MaterialIcons';
-import {arlURL, commonURL} from '../../../../../App';
+import { arlURL, commonURL } from '../../../../../App';
 import {
   ApproveApplications,
   GetAllPendingApplicationsForApproval,
   LeaveApplicationApproval,
-  LeaveApplicationLanding} from '../../../../common/api/api';
+  LeaveApplicationLanding,
+} from '../../../../common/api/api';
 import ContainerNew from '../../../../common/components/Container';
 import CustomHeader from '../../../../common/components/CustomHeader';
 import CustomModalNew from '../../../../common/components/CustomModal';
-import {useToast} from '../../../../common/components/CustomToast';
-import {IMAGES} from '../../../../common/constant/Index';
-import {COLORS} from '../../../../common/constant/Themes';
-import {httpRequest} from '../../../../common/constant/httpRequest';
+import { useToast } from '../../../../common/components/CustomToast';
+import { IMAGES } from '../../../../common/constant/Index';
+import { COLORS } from '../../../../common/constant/Themes';
+import { httpRequest } from '../../../../common/constant/httpRequest';
 import useAsyncEffect from '../../../../common/packages/useAsyncEffect/useAsyncEffect';
-import {date_formater, getDay} from '../../../../common/services/dateFormater';
+import {
+  date_formater,
+  getDay,
+} from '../../../../common/services/dateFormater';
 import {
   getStatusBgColor,
-  getStatusColor} from '../../../../common/services/getColor';
-import {getImageURL} from '../../../../common/services/getImage';
-import {LeaveApprovalType} from '../../../../interfaces/leave/leave';
-import {useRootStore} from '../../../../stores/rootStore';
+  getStatusColor,
+} from '../../../../common/services/getColor';
+import { getImageURL } from '../../../../common/services/getImage';
+import { LeaveApprovalType } from '../../../../interfaces/leave/leave';
+import { useRootStore } from '../../../../stores/rootStore';
 import useAuditLogSave from '../../../../common/hooks/useAuditLogSave';
 import TopBarItem from '../../../../common/components/TabBaritem';
 import Row from '../../../../common/components/Row';
 import LoadingContainer from '../../../../common/components/Loading';
-
 
 const edges1: Edge[] = ['right', 'bottom', 'left', 'top'];
 const edges2: Edge[] = ['right', 'bottom', 'left'];
@@ -69,7 +78,7 @@ const LeaveApprovalMainIndex = () => {
   const toaster = useToast();
   const route = useRoute();
   const navigation = useNavigation();
-  const {userInfo} = useRootStore();
+  const { userInfo } = useRootStore();
   const [isLoading, setIsLoading] = useState(false);
   const isFocused = useIsFocused();
   const [isSearch, setIsSearch] = useState(true);
@@ -77,12 +86,21 @@ const LeaveApprovalMainIndex = () => {
   const [isModalShow, setIsModalShow] = useState(false);
   const [isModalShow2, setIsModalShow2] = useState(false);
   const [isSelectAll, setIsSelectAll] = useState(false);
-  const [topBar, setTopBar] = useState(topBarItem);
-  const [activeTabName, setActiveTabName] = useState('commonApproval');
+  // Opens on the tab the approval dashboard was on, so the list matches the
+  // count that was tapped; the tabs below still switch it from here.
+  const initialTabName =
+    (route?.params as any)?.activeTabName || 'commonApproval';
+  const [topBar, setTopBar] = useState(() =>
+    topBarItem.map(tab => ({
+      ...tab,
+      isActive: tab?.nameForApi === initialTabName,
+    })),
+  );
+  const [activeTabName, setActiveTabName] = useState(initialTabName);
   const [leaveApprovalLandingData, setLeaveApprovalLandingData] = useState<
     LeaveApprovalType[]
   >([]);
-  const {saveLogAction} = useAuditLogSave();
+  const { saveLogAction } = useAuditLogSave();
   //@ts-ignore
   const leaveLanData = route?.params;
 
@@ -423,7 +441,8 @@ const LeaveApprovalMainIndex = () => {
           )}
         </>
       }
-      style={styles.container}>
+      style={styles.container}
+    >
       <LoadingContainer isLoading={isLoading} />
       {userInfo?.strUrl === commonURL && (
         <>
@@ -451,7 +470,7 @@ const LeaveApprovalMainIndex = () => {
               value={isSelectAll}
               onValueChange={() => AllActiveDeactiveHandler()}
               style={styles.checkbox}
-              tintColors={{true: 'white', false: 'white'}}
+              tintColors={{ true: 'white', false: 'white' }}
               tintColor={COLORS.white}
               onCheckColor={COLORS.white}
               onTintColor={COLORS.white}
@@ -462,12 +481,14 @@ const LeaveApprovalMainIndex = () => {
           <View style={styles.flexRow}>
             <TouchableOpacity
               onPress={() => setIsModalShow2(true)}
-              style={styles.approveOrReject}>
+              style={styles.approveOrReject}
+            >
               <Text style={styles.rejectApproveText}>Reject</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => setIsModalShow(true)}
-              style={[styles.approveOrReject, styles.marginLeft]}>
+              style={[styles.approveOrReject, styles.marginLeft]}
+            >
               <Text style={styles.rejectApproveText}>Approve</Text>
             </TouchableOpacity>
           </View>
@@ -477,7 +498,8 @@ const LeaveApprovalMainIndex = () => {
         style={[
           isSearch ? styles.isSearchTrue : styles.isSearchFalse,
           styles.paddingHorizontl,
-        ]}>
+        ]}
+      >
         {leaveApprovalLandingData?.length > 0 ? (
           <FlatList
             removeClippedSubviews
@@ -517,7 +539,8 @@ const LeaveApprovalMainIndex = () => {
                         ? COLORS.lightPrimary2
                         : COLORS.white,
                     },
-                  ]}>
+                  ]}
+                >
                   <View>
                     {item?.profileUrlId ? (
                       <View
@@ -526,7 +549,8 @@ const LeaveApprovalMainIndex = () => {
                           {
                             backgroundColor: COLORS.white,
                           },
-                        ]}>
+                        ]}
+                      >
                         <FastImage
                           source={{
                             uri: getImageURL(item?.profileUrlId),
@@ -575,7 +599,8 @@ const LeaveApprovalMainIndex = () => {
                               backgroundColor: getStatusBgColor('pending'),
                             },
                             styles.statusTxt,
-                          ]}>
+                          ]}
+                        >
                           {item?.status}
                         </Text>
                       </View>
@@ -650,7 +675,7 @@ const styles = StyleSheet.create({
     elevation: 3,
     backgroundColor: COLORS.white,
     shadowColor: COLORS.black,
-    shadowOffset: {width: 0, height: 0},
+    shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
     paddingVertical: 16,
@@ -768,8 +793,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 2,
   },
-  isSearchTrue: {marginTop: 0},
-  isSearchFalse: {marginTop: 90},
+  isSearchTrue: { marginTop: 0 },
+  isSearchFalse: { marginTop: 90 },
   checkboxContainer: {
     flexDirection: 'row',
     marginBottom: 0,

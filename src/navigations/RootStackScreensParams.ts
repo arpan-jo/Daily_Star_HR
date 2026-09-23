@@ -171,6 +171,8 @@ export type RootStackScreensParams = {
   AdvanceExpenseMainIndex: any;
   IncrementApprovalMainIndex: any;
   IncrementApprovalDetails: any;
+  CommonApprovalMainIndex: any;
+  CommonApprovalDetails: any;
   SalaryGenerateApprovalMainIndex: any;
   SalaryGenerateApprovalDetails: any;
   ARLSiteReg: any;

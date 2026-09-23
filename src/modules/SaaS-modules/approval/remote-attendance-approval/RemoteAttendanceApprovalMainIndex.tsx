@@ -1,5 +1,9 @@
-import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
-import React, {useEffect, useState} from 'react';
+import {
+  useIsFocused,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Platform,
@@ -8,33 +12,35 @@ import {
   Text,
   TouchableOpacity,
   UIManager,
-  View} from 'react-native';
+  View,
+} from 'react-native';
 import FastImage from 'react-native-fast-image';
-import {Edge} from 'react-native-safe-area-context';
+import { Edge } from 'react-native-safe-area-context';
 import MIcon from 'react-native-vector-icons/MaterialIcons';
 import CheckBox from '@react-native-community/checkbox';
 import ContainerNew from '../../../../common/components/Container';
 import CustomModalNew from '../../../../common/components/CustomModal';
 import CustomHeader from '../../../../common/components/CustomHeader';
-import {IMAGES} from '../../../../common/constant/Index';
-import {COLORS} from '../../../../common/constant/Themes';
-import {date_formater} from '../../../../common/services/dateFormater';
+import { IMAGES } from '../../../../common/constant/Index';
+import { COLORS } from '../../../../common/constant/Themes';
+import { date_formater } from '../../../../common/services/dateFormater';
 import {
   getStatusColor,
-  getStatusBgColor} from '../../../../common/services/getColor';
-import {timeFormaterToPmAm} from '../../../../common/services/timeFormater';
-import {AttendanceLocationApprovalType} from '../../../../interfaces/attendance/attendance';
-import {
-  remoteAttendanceApprovall} from '../../../../services/SaaS-modules/attendance/attendance';
-import {useRootStore} from '../../../../stores/rootStore';
-import {useToast} from '../../../../common/components/CustomToast';
+  getStatusBgColor,
+} from '../../../../common/services/getColor';
+import { timeFormaterToPmAm } from '../../../../common/services/timeFormater';
+import { AttendanceLocationApprovalType } from '../../../../interfaces/attendance/attendance';
+import { remoteAttendanceApprovall } from '../../../../services/SaaS-modules/attendance/attendance';
+import { useRootStore } from '../../../../stores/rootStore';
+import { useToast } from '../../../../common/components/CustomToast';
 import useAsyncEffect from '../../../../common/packages/useAsyncEffect/useAsyncEffect';
 import {
   ApproveApplications,
   GetAllPendingApplicationsForApproval,
-  RemoteAttendanceLanding} from '../../../../common/api/api';
-import {httpRequest} from '../../../../common/constant/httpRequest';
-import {commonURL} from '../../../../../App';
+  RemoteAttendanceLanding,
+} from '../../../../common/api/api';
+import { httpRequest } from '../../../../common/constant/httpRequest';
+import { commonURL } from '../../../../../App';
 import Row from '../../../../common/components/Row';
 import TopBarItem from '../../../../common/components/TabBaritem';
 
@@ -63,7 +69,7 @@ const topBarItem = [
 ];
 const RemoteAttendanceApprovalMainIndex = () => {
   const navigation = useNavigation();
-  const {userInfo} = useRootStore();
+  const { userInfo } = useRootStore();
   const toaster = useToast();
   const route = useRoute();
   const [isLoading, setIsLoading] = useState(false);
@@ -73,8 +79,17 @@ const RemoteAttendanceApprovalMainIndex = () => {
   const [isSelectAll, setIsSelectAll] = useState(false);
   const [isModalShow, setIsModalShow] = useState(false);
   const [isModalShow2, setIsModalShow2] = useState(false);
-  const [topBar, setTopBar] = useState(topBarItem);
-  const [activeTabName, setActiveTabName] = useState('commonApproval');
+  // Opens on the tab the approval dashboard was on, so the list matches the
+  // count that was tapped; the tabs below still switch it from here.
+  const initialTabName =
+    (route?.params as any)?.activeTabName || 'commonApproval';
+  const [topBar, setTopBar] = useState(() =>
+    topBarItem.map(tab => ({
+      ...tab,
+      isActive: tab?.nameForApi === initialTabName,
+    })),
+  );
+  const [activeTabName, setActiveTabName] = useState(initialTabName);
 
   //@ts-ignore
   const remAttnApp = route?.params;
@@ -214,7 +229,7 @@ const RemoteAttendanceApprovalMainIndex = () => {
         };
         const res = await httpRequest(api_params, () => {});
         if (res) {
-          toaster.show({message: res?.message || res?.data, type: 'success'});
+          toaster.show({ message: res?.message || res?.data, type: 'success' });
           allDeactive();
         }
       } else {
@@ -223,7 +238,7 @@ const RemoteAttendanceApprovalMainIndex = () => {
           setIsLoading,
         );
         if (res) {
-          toaster.show({message: res?.data, type: 'success'});
+          toaster.show({ message: res?.data, type: 'success' });
           allDeactive();
         }
       }
@@ -240,7 +255,7 @@ const RemoteAttendanceApprovalMainIndex = () => {
         };
         const res = await httpRequest(api_params, () => {});
         if (res) {
-          toaster.show({message: res?.message || res?.data, type: 'success'});
+          toaster.show({ message: res?.message || res?.data, type: 'success' });
           allDeactive();
         }
       } else {
@@ -250,7 +265,7 @@ const RemoteAttendanceApprovalMainIndex = () => {
         );
 
         if (res) {
-          toaster.show({message: res?.data, type: 'success'});
+          toaster.show({ message: res?.data, type: 'success' });
           allDeactive();
         }
       }
@@ -439,7 +454,8 @@ const RemoteAttendanceApprovalMainIndex = () => {
           )}
         </>
       }
-      style={styles.container}>
+      style={styles.container}
+    >
       {userInfo?.strUrl === commonURL && (
         <>
           <Row style={styles.toptabstyle}>
@@ -472,7 +488,7 @@ const RemoteAttendanceApprovalMainIndex = () => {
               value={isSelectAll}
               onValueChange={AllActiveDeactiveHandler}
               style={styles.checkbox}
-              tintColors={{true: 'white', false: 'white'}}
+              tintColors={{ true: 'white', false: 'white' }}
               tintColor={COLORS.white}
               onCheckColor={COLORS.white}
               onTintColor={COLORS.white}
@@ -483,13 +499,15 @@ const RemoteAttendanceApprovalMainIndex = () => {
           <View style={styles.approvehead}>
             <TouchableOpacity
               onPress={() => setIsModalShow2(true)}
-              style={styles.approveOrReject}>
+              style={styles.approveOrReject}
+            >
               <Text style={styles.rejectApproveText}>Reject</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={() => setIsModalShow(true)}
-              style={[styles.approveOrReject, styles.marginLeft]}>
+              style={[styles.approveOrReject, styles.marginLeft]}
+            >
               <Text style={styles.rejectApproveText}>Approve</Text>
             </TouchableOpacity>
           </View>
@@ -505,7 +523,8 @@ const RemoteAttendanceApprovalMainIndex = () => {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        style={styles.paddingHorizantal}>
+        style={styles.paddingHorizantal}
+      >
         {remoteAttendance?.length > 0 &&
           remoteAttendance?.map((item, index) => (
             <TouchableOpacity
@@ -525,7 +544,8 @@ const RemoteAttendanceApprovalMainIndex = () => {
                     activeTabName: activeTabName,
                   });
                 }
-              }}>
+              }}
+            >
               <View
                 style={[
                   styles.card,
@@ -534,7 +554,8 @@ const RemoteAttendanceApprovalMainIndex = () => {
                       ? COLORS.lightPrimary2
                       : COLORS.white,
                   },
-                ]}>
+                ]}
+              >
                 <View>
                   <View style={styles.noImageBox}>
                     <FastImage source={IMAGES.NoImage} style={styles.noImage} />
@@ -563,7 +584,8 @@ const RemoteAttendanceApprovalMainIndex = () => {
                             color: getStatusColor(item?.status),
                             backgroundColor: getStatusBgColor(item?.status),
                           },
-                        ]}>
+                        ]}
+                      >
                         {item?.status}
                       </Text>
                     </View>
@@ -647,7 +669,7 @@ const styles = StyleSheet.create({
     elevation: 3,
     backgroundColor: COLORS.white,
     shadowColor: COLORS.black,
-    shadowOffset: {width: 0, height: 0},
+    shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
     paddingVertical: 16,
@@ -718,7 +740,7 @@ const styles = StyleSheet.create({
   flexRow: {
     flexDirection: 'row',
   },
-  image: {width: 130, height: 90},
+  image: { width: 130, height: 90 },
   noDataText: {
     textAlign: 'center',
     color: COLORS.textNewColor,
@@ -790,7 +812,7 @@ const styles = StyleSheet.create({
   approvehead: {
     flexDirection: 'row',
   },
-  paddingHorizantal: {paddingHorizontal: 16},
+  paddingHorizantal: { paddingHorizontal: 16 },
   toptabstyle: {
     backgroundColor: COLORS.primary,
     flexDirection: 'row',

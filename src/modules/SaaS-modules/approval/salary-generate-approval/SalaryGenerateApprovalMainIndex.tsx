@@ -1,28 +1,38 @@
 import CheckBox from '@react-native-community/checkbox';
-import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
-import {observer} from 'mobx-react-lite';
-import React, {useState} from 'react';
-import {Platform, Text, TouchableOpacity, UIManager, View} from 'react-native';
-import {Edge} from 'react-native-safe-area-context';
-import {commonURL} from '../../../../../App';
-import {GetAllPendingApplicationsForApproval} from '../../../../common/api/api';
-import {commonApprovalMainIndexStyle as styles} from '../../../../common/commonStyle/commonApprovalMainIndexStyle';
+import {
+  useIsFocused,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
+import { observer } from 'mobx-react-lite';
+import React, { useState } from 'react';
+import {
+  Platform,
+  Text,
+  TouchableOpacity,
+  UIManager,
+  View,
+} from 'react-native';
+import { Edge } from 'react-native-safe-area-context';
+import { commonURL } from '../../../../../App';
+import { GetAllPendingApplicationsForApproval } from '../../../../common/api/api';
+import { commonApprovalMainIndexStyle as styles } from '../../../../common/commonStyle/commonApprovalMainIndexStyle';
 import Column from '../../../../common/components/Column';
 import CommonApprovalMainIndexCard from '../../../../common/components/CommonApprovalMainIndexCard';
 import ContainerNew from '../../../../common/components/Container';
 import CustomFlatList from '../../../../common/components/CustomFlatList';
 import CustomHeader from '../../../../common/components/CustomHeader';
 import CustomModalNew from '../../../../common/components/CustomModal';
-import {useToast} from '../../../../common/components/CustomToast';
-import {httpRequest} from '../../../../common/constant/httpRequest';
-import {COLORS} from '../../../../common/constant/Themes';
+import { useToast } from '../../../../common/components/CustomToast';
+import { httpRequest } from '../../../../common/constant/httpRequest';
+import { COLORS } from '../../../../common/constant/Themes';
 import useAsyncEffect from '../../../../common/packages/useAsyncEffect/useAsyncEffect';
-import {date_formater} from '../../../../common/services/dateFormater';
-import {getMonthNameByMonthId} from '../../../../common/services/getMonthNameByMonthId';
-import {handleSelectionChange} from '../../../../hooks/useApprovalSelectionV2';
-import {handleApprovalAction} from '../../../../hooks/useCommonApprovalV2';
-import {ProfileDataType} from '../../../../interfaces/dashboard/employeeDashboard';
-import {useRootStore} from '../../../../stores/rootStore';
+import { date_formater } from '../../../../common/services/dateFormater';
+import { getMonthNameByMonthId } from '../../../../common/services/getMonthNameByMonthId';
+import { handleSelectionChange } from '../../../../hooks/useApprovalSelectionV2';
+import { handleApprovalAction } from '../../../../hooks/useCommonApprovalV2';
+import { ProfileDataType } from '../../../../interfaces/dashboard/employeeDashboard';
+import { useRootStore } from '../../../../stores/rootStore';
 
 const edges1: Edge[] = ['right', 'bottom', 'left', 'top'];
 const edges2: Edge[] = ['right', 'bottom', 'left'];
@@ -37,7 +47,7 @@ if (
 const SalaryGenerateApprovalMainIndex = () => {
   const isFocused = useIsFocused();
   const navigation = useNavigation();
-  const {userInfo} = useRootStore();
+  const { userInfo } = useRootStore();
   const route = useRoute();
   const [isLoading, setIsLoading] = useState(false);
   const [salaryGenerateData, setSalaryGenerateData] = useState<any>();
@@ -60,6 +70,7 @@ const SalaryGenerateApprovalMainIndex = () => {
     //@ts-ignore
     applicationTypeId: incrementLanData?.applicationTypeId,
     employeeId: userInfo?.intEmployeeId,
+    isAdmin: incrementLanData?.activeTabName === 'adminApproval' ? true : false,
     // for common new approval api  v2
   };
 
@@ -106,16 +117,15 @@ const SalaryGenerateApprovalMainIndex = () => {
     setIsShowHeader(true);
     getLandingDataApi(); // need for v2 approval
   };
-  const handleToggleItem = ({index, mode}: any) => {
+  const handleToggleItem = ({ index, mode }: any) => {
     !isSearch && setIsSearch(true);
-    const {updatedData, isShowHeader, isSelectAllState} = handleSelectionChange(
-      {
+    const { updatedData, isShowHeader, isSelectAllState } =
+      handleSelectionChange({
         data: salaryGenerateData,
         mode: mode,
         index,
         isSelectAll,
-      },
-    );
+      });
     setSalaryGenerateData(updatedData);
     setIsShowHeader(isShowHeader);
     if (mode === 'single') {
@@ -126,15 +136,15 @@ const SalaryGenerateApprovalMainIndex = () => {
     }
   };
 
-  const renderItem = ({item, index}: any) => {
+  const renderItem = ({ item, index }: any) => {
     return (
       <Column key={index?.toString()}>
         <TouchableOpacity
           // onLongPress={() => activeDeactiveHandler(index)}
-          onLongPress={() => handleToggleItem({index: index, mode: 'single'})}
+          onLongPress={() => handleToggleItem({ index: index, mode: 'single' })}
           onPress={() => {
             if (isTrueSingleClick?.length > 0) {
-              handleToggleItem({index: index, mode: 'single'});
+              handleToggleItem({ index: index, mode: 'single' });
             } else {
               navigation.navigate('SalaryGenerateApprovalDetails', {
                 salaryApprovalDetails: item,
@@ -148,7 +158,8 @@ const SalaryGenerateApprovalMainIndex = () => {
                 ? COLORS.lightPrimary2
                 : COLORS.white,
             },
-          ]}>
+          ]}
+        >
           <CommonApprovalMainIndexCard
             item={item}
             index={index}
@@ -185,16 +196,17 @@ const SalaryGenerateApprovalMainIndex = () => {
           onBackPress={navigation.goBack}
         />
       }
-      style={styles.container}>
+      style={styles.container}
+    >
       {isTrueSingleClick !== undefined && isTrueSingleClick?.length > 0 && (
         <View style={styles.headMain}>
           <View style={styles.checkboxContainer}>
             <CheckBox
               disabled={false}
               value={isSelectAll}
-              onValueChange={() => handleToggleItem({mode: 'all'})}
+              onValueChange={() => handleToggleItem({ mode: 'all' })}
               style={styles.checkbox}
-              tintColors={{true: 'white', false: 'white'}}
+              tintColors={{ true: 'white', false: 'white' }}
               tintColor={COLORS.white}
               onCheckColor={COLORS.white}
               onTintColor={COLORS.white}
@@ -205,13 +217,15 @@ const SalaryGenerateApprovalMainIndex = () => {
           <View style={styles.flexRow}>
             <TouchableOpacity
               onPress={() => setIsModalShow2(true)}
-              style={styles.approveOrReject}>
+              style={styles.approveOrReject}
+            >
               <Text style={styles.rejectApproveText}>Reject</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={() => setIsModalShow(true)}
-              style={[styles.approveOrReject, styles.marginLeft]}>
+              style={[styles.approveOrReject, styles.marginLeft]}
+            >
               <Text style={styles.rejectApproveText}>Approve</Text>
             </TouchableOpacity>
           </View>

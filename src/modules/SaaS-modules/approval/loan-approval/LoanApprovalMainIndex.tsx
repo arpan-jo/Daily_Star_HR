@@ -1,5 +1,9 @@
-import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
-import React, {useState} from 'react';
+import {
+  useIsFocused,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
+import React, { useState } from 'react';
 import {
   ActivityIndicator,
   LayoutAnimation,
@@ -11,7 +15,7 @@ import {
   View,
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import {Edge} from 'react-native-safe-area-context';
+import { Edge } from 'react-native-safe-area-context';
 import MIcon from 'react-native-vector-icons/MaterialIcons';
 import {
   ApproveApplications,
@@ -22,20 +26,20 @@ import {
 import ContainerNew from '../../../../common/components/Container';
 import CustomHeader from '../../../../common/components/CustomHeader';
 import CustomModalNew from '../../../../common/components/CustomModal';
-import {useToast} from '../../../../common/components/CustomToast';
+import { useToast } from '../../../../common/components/CustomToast';
 import SearchHeader from '../../../../common/components/SearchHeader';
-import {IMAGES} from '../../../../common/constant/Index';
-import {COLORS} from '../../../../common/constant/Themes';
-import {httpRequest} from '../../../../common/constant/httpRequest';
+import { IMAGES } from '../../../../common/constant/Index';
+import { COLORS } from '../../../../common/constant/Themes';
+import { httpRequest } from '../../../../common/constant/httpRequest';
 import useAsyncEffect from '../../../../common/packages/useAsyncEffect/useAsyncEffect';
-import {date_formater} from '../../../../common/services/dateFormater';
+import { date_formater } from '../../../../common/services/dateFormater';
 import {
   getStatusBgColor,
   getStatusColor,
 } from '../../../../common/services/getColor';
-import {LoanApprovalLandingListDataType} from '../../../../interfaces/loan/loan';
-import {useRootStore} from '../../../../stores/rootStore';
-import {commonURL} from '../../../../../App';
+import { LoanApprovalLandingListDataType } from '../../../../interfaces/loan/loan';
+import { useRootStore } from '../../../../stores/rootStore';
+import { commonURL } from '../../../../../App';
 
 const edges1: Edge[] = ['right', 'bottom', 'left', 'top'];
 const edges2: Edge[] = ['right', 'bottom', 'left'];
@@ -51,7 +55,7 @@ const LoanApprovalMainIndex = () => {
   const toaster = useToast();
   const [employeeName, setEmployeeName] = useState('');
   const navigation = useNavigation();
-  const {userInfo} = useRootStore();
+  const { userInfo } = useRootStore();
   const [isLoading, setIsLoading] = useState(false);
   const isFocused = useIsFocused();
   const route = useRoute();
@@ -92,6 +96,10 @@ const LoanApprovalMainIndex = () => {
           //@ts-ignore
           applicationTypeId: loanApprData?.applicationTypeId,
           employeeId: userInfo?.intEmployeeId,
+          isAdmin:
+            (loanApprData as any)?.activeTabName === 'adminApproval'
+              ? true
+              : false,
           // for common new approval api  v2
         }
       : landingPayload;
@@ -221,7 +229,7 @@ const LoanApprovalMainIndex = () => {
       };
       const res = await httpRequest(api_params, () => {});
       if (res) {
-        toaster.show({message: res?.message || res, type: 'success'});
+        toaster.show({ message: res?.message || res, type: 'success' });
         allDeactive();
       }
     }
@@ -239,7 +247,7 @@ const LoanApprovalMainIndex = () => {
       };
       const res = await httpRequest(api_params, () => {});
       if (res) {
-        toaster.show({message: res?.message || res, type: 'success'});
+        toaster.show({ message: res?.message || res, type: 'success' });
         allDeactive();
       }
     }
@@ -407,7 +415,8 @@ const LoanApprovalMainIndex = () => {
           )}
         </>
       }
-      style={styles.container}>
+      style={styles.container}
+    >
       {isTrueSingleClick !== undefined && isTrueSingleClick?.length > 0 && (
         <View style={styles.headMain}>
           <View style={styles.closeIconHead}>
@@ -422,13 +431,15 @@ const LoanApprovalMainIndex = () => {
           <View style={styles.approvehead}>
             <TouchableOpacity
               onPress={() => setIsModalShow2(true)}
-              style={styles.approveOrReject}>
+              style={styles.approveOrReject}
+            >
               <Text style={styles.rejectApproveText}>Reject</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={() => setIsModalShow(true)}
-              style={[styles.approveOrReject, styles.marginLeft]}>
+              style={[styles.approveOrReject, styles.marginLeft]}
+            >
               <Text style={styles.rejectApproveText}>Approve</Text>
             </TouchableOpacity>
           </View>
@@ -438,7 +449,8 @@ const LoanApprovalMainIndex = () => {
         style={[
           isSearch ? styles.isSearchTrue : styles.isSearchFalse,
           styles.horizontalPad,
-        ]}>
+        ]}
+      >
         {isLoading ? (
           <ActivityIndicator size={'large'} color={COLORS.primary} />
         ) : null}
@@ -467,7 +479,8 @@ const LoanApprovalMainIndex = () => {
                   ? COLORS.lightPrimary2
                   : COLORS.white,
               },
-            ]}>
+            ]}
+          >
             <View>
               <View style={styles.noImageBox}>
                 <FastImage source={IMAGES.NoImage} style={styles.noImage} />
@@ -477,7 +490,8 @@ const LoanApprovalMainIndex = () => {
               style={[
                 styles.txtPart,
                 item?.isActive ? styles.isActiveTrue : styles.isActiveFalse,
-              ]}>
+              ]}
+            >
               <View style={styles.rowSpaceBetween}>
                 <Text style={styles.empName}>{item?.strEmployeeName}</Text>
               </View>
@@ -502,7 +516,8 @@ const LoanApprovalMainIndex = () => {
                           item?.application?.strStatus,
                         ),
                       },
-                    ]}>
+                    ]}
+                  >
                     {item?.application?.strStatus}
                   </Text>
                 </View>
@@ -565,7 +580,7 @@ const styles = StyleSheet.create({
     elevation: 3,
     backgroundColor: COLORS.white,
     shadowColor: COLORS.black,
-    shadowOffset: {width: 0, height: 0},
+    shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
     paddingVertical: 16,
@@ -625,14 +640,14 @@ const styles = StyleSheet.create({
   padBottom: {
     paddingBottom: 200,
   },
-  image: {width: 130, height: 90},
+  image: { width: 130, height: 90 },
   noDataText: {
     textAlign: 'center',
     color: COLORS.textNewColor,
     paddingTop: 10,
     fontSize: 14,
   },
-  noDataBox: {alignSelf: 'center', paddingTop: 20},
+  noDataBox: { alignSelf: 'center', paddingTop: 20 },
 
   headMain: {
     flexDirection: 'row',
@@ -656,7 +671,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
   },
-  closeIconHead: {flexDirection: 'row', alignItems: 'center'},
+  closeIconHead: { flexDirection: 'row', alignItems: 'center' },
   singleClickText: {
     fontSize: 20,
     fontWeight: '600',
@@ -666,10 +681,10 @@ const styles = StyleSheet.create({
   marginLeft: {
     marginLeft: 8,
   },
-  approvehead: {flexDirection: 'row'},
-  horizontalPad: {paddingHorizontal: 16},
-  isSearchTrue: {marginTop: 0},
-  isSearchFalse: {marginTop: 90},
-  isActiveTrue: {paddingLeft: 8},
-  isActiveFalse: {paddingLeft: 16},
+  approvehead: { flexDirection: 'row' },
+  horizontalPad: { paddingHorizontal: 16 },
+  isSearchTrue: { marginTop: 0 },
+  isSearchFalse: { marginTop: 90 },
+  isActiveTrue: { paddingLeft: 8 },
+  isActiveFalse: { paddingLeft: 16 },
 });

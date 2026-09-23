@@ -1,5 +1,9 @@
-import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
-import React, {useEffect, useState} from 'react';
+import {
+  useIsFocused,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
 import {
   FlatList,
   LayoutAnimation,
@@ -8,33 +12,36 @@ import {
   Text,
   TouchableOpacity,
   UIManager,
-  View} from 'react-native';
+  View,
+} from 'react-native';
 import FastImage from 'react-native-fast-image';
-import {Edge} from 'react-native-safe-area-context';
+import { Edge } from 'react-native-safe-area-context';
 import CheckBox from '@react-native-community/checkbox';
 import MIcon from 'react-native-vector-icons/MaterialIcons';
 import ContainerNew from '../../../../common/components/Container';
 import CustomModalNew from '../../../../common/components/CustomModal';
 import CustomHeader from '../../../../common/components/CustomHeader';
 import SearchHeader from '../../../../common/components/SearchHeader';
-import {IMAGES} from '../../../../common/constant/Index';
-import {COLORS} from '../../../../common/constant/Themes';
-import {date_formater} from '../../../../common/services/dateFormater';
+import { IMAGES } from '../../../../common/constant/Index';
+import { COLORS } from '../../../../common/constant/Themes';
+import { date_formater } from '../../../../common/services/dateFormater';
 import {
   getStatusColor,
-  getStatusBgColor} from '../../../../common/services/getColor';
-import {AttendanceAdjustmentApprovalLandingListDataType} from '../../../../interfaces/attendance/attendance';
+  getStatusBgColor,
+} from '../../../../common/services/getColor';
+import { AttendanceAdjustmentApprovalLandingListDataType } from '../../../../interfaces/attendance/attendance';
 
-import {useRootStore} from '../../../../stores/rootStore';
-import {useToast} from '../../../../common/components/CustomToast';
+import { useRootStore } from '../../../../stores/rootStore';
+import { useToast } from '../../../../common/components/CustomToast';
 import useAsyncEffect from '../../../../common/packages/useAsyncEffect/useAsyncEffect';
 import {
   ApproveApplications,
   GetAllPendingApplicationsForApproval,
   ManualAttendanceApprovalEngine,
-  ManualAttendanceLandingEngine} from '../../../../common/api/api';
-import {httpRequest} from '../../../../common/constant/httpRequest';
-import {arlURL, commonURL} from '../../../../../App';
+  ManualAttendanceLandingEngine,
+} from '../../../../common/api/api';
+import { httpRequest } from '../../../../common/constant/httpRequest';
+import { arlURL, commonURL } from '../../../../../App';
 import useAuditLogSave from '../../../../common/hooks/useAuditLogSave';
 import Row from '../../../../common/components/Row';
 import TopBarItem from '../../../../common/components/TabBaritem';
@@ -66,7 +73,7 @@ const topBarItem = [
 const AttendanceAdjustmentApprovalMainIndex = () => {
   const toaster = useToast();
   const navigation = useNavigation();
-  const {userInfo} = useRootStore();
+  const { userInfo } = useRootStore();
   const [isLoading, setIsLoading] = useState(false);
   const isFocused = useIsFocused();
   const route = useRoute();
@@ -76,9 +83,18 @@ const AttendanceAdjustmentApprovalMainIndex = () => {
   const [isModalShow, setIsModalShow] = useState(false);
   const [isModalShow2, setIsModalShow2] = useState(false);
   const [isSelectAll, setIsSelectAll] = useState(false);
-  const [topBar, setTopBar] = useState(topBarItem);
-  const [activeTabName, setActiveTabName] = useState('commonApproval');
-  const {saveLogAction} = useAuditLogSave();
+  // Opens on the tab the approval dashboard was on, so the list matches the
+  // count that was tapped; the tabs below still switch it from here.
+  const initialTabName =
+    (route?.params as any)?.activeTabName || 'commonApproval';
+  const [topBar, setTopBar] = useState(() =>
+    topBarItem.map(tab => ({
+      ...tab,
+      isActive: tab?.nameForApi === initialTabName,
+    })),
+  );
+  const [activeTabName, setActiveTabName] = useState(initialTabName);
+  const { saveLogAction } = useAuditLogSave();
 
   //@ts-ignore
   const attAdjApp = route?.params;
@@ -529,7 +545,8 @@ const AttendanceAdjustmentApprovalMainIndex = () => {
           )}
         </>
       }
-      style={styles.container}>
+      style={styles.container}
+    >
       <LoadingContainer isLoading={isLoading} />
       {userInfo?.strUrl === commonURL && (
         <>
@@ -563,7 +580,7 @@ const AttendanceAdjustmentApprovalMainIndex = () => {
               value={isSelectAll}
               onValueChange={() => AllActiveDeactiveHandler()}
               style={styles.checkbox}
-              tintColors={{true: 'white', false: 'white'}}
+              tintColors={{ true: 'white', false: 'white' }}
               tintColor={COLORS.white}
               onCheckColor={COLORS.white}
               onTintColor={COLORS.white}
@@ -574,13 +591,15 @@ const AttendanceAdjustmentApprovalMainIndex = () => {
           <View style={styles.approvehead}>
             <TouchableOpacity
               onPress={() => setIsModalShow2(true)}
-              style={styles.approveOrReject}>
+              style={styles.approveOrReject}
+            >
               <Text style={styles.rejectApproveText}>Reject</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={() => setIsModalShow(true)}
-              style={[styles.approveOrReject, styles.marginLeft]}>
+              style={[styles.approveOrReject, styles.marginLeft]}
+            >
               <Text style={styles.rejectApproveText}>Approve</Text>
             </TouchableOpacity>
           </View>
@@ -591,7 +610,8 @@ const AttendanceAdjustmentApprovalMainIndex = () => {
         style={[
           isSearch ? styles.isSearchTrue : styles.isSearchFalse,
           styles.horizontalPad,
-        ]}>
+        ]}
+      >
         {attAdjustApprovalLandingData?.length > 0 ? (
           <FlatList
             ListHeaderComponentStyle={styles.paddingTop}
@@ -601,7 +621,7 @@ const AttendanceAdjustmentApprovalMainIndex = () => {
             ListFooterComponent={() => <View />}
             ListHeaderComponent={() => <View />}
             data={attAdjustApprovalLandingData}
-            renderItem={({item, index}) => (
+            renderItem={({ item, index }) => (
               <TouchableOpacity
                 key={index}
                 onLongPress={() => {
@@ -627,7 +647,8 @@ const AttendanceAdjustmentApprovalMainIndex = () => {
                       ? COLORS.lightPrimary2
                       : COLORS.white,
                   },
-                ]}>
+                ]}
+              >
                 <View>
                   <View style={styles.noImageBox}>
                     <FastImage source={IMAGES.NoImage} style={styles.noImage} />
@@ -639,7 +660,8 @@ const AttendanceAdjustmentApprovalMainIndex = () => {
                     item?.isActive
                       ? styles.isActivityTrue
                       : styles.isActivityFalse,
-                  ]}>
+                  ]}
+                >
                   <View style={styles.rowSpaceBetween}>
                     <Text style={styles.empName}>{item?.strEmployeeName}</Text>
                   </View>
@@ -666,7 +688,8 @@ const AttendanceAdjustmentApprovalMainIndex = () => {
                               item?.application?.strStatus,
                             ),
                           },
-                        ]}>
+                        ]}
+                      >
                         {item?.application?.strStatus}
                       </Text>
                     </View>
@@ -731,7 +754,7 @@ const styles = StyleSheet.create({
     elevation: 3,
     backgroundColor: COLORS.white,
     shadowColor: COLORS.black,
-    shadowOffset: {width: 0, height: 0},
+    shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
     paddingVertical: 16,
@@ -816,12 +839,12 @@ const styles = StyleSheet.create({
   marginLeft: {
     marginLeft: 8,
   },
-  approvehead: {flexDirection: 'row'},
-  horizontalPad: {paddingHorizontal: 16},
-  isSearchTrue: {marginTop: 0},
-  isSearchFalse: {marginTop: 90},
-  isActivityTrue: {paddingLeft: 8},
-  isActivityFalse: {paddingLeft: 16},
+  approvehead: { flexDirection: 'row' },
+  horizontalPad: { paddingHorizontal: 16 },
+  isSearchTrue: { marginTop: 0 },
+  isSearchFalse: { marginTop: 90 },
+  isActivityTrue: { paddingLeft: 8 },
+  isActivityFalse: { paddingLeft: 16 },
   paddingBottom: {
     paddingBottom: 50,
   },

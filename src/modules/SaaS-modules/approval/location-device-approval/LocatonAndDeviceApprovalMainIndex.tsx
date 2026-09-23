@@ -1,5 +1,9 @@
-import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
-import React, {useState} from 'react';
+import {
+  useIsFocused,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
+import React, { useState } from 'react';
 import {
   ActivityIndicator,
   Platform,
@@ -8,26 +12,29 @@ import {
   Text,
   TouchableOpacity,
   UIManager,
-  View} from 'react-native';
+  View,
+} from 'react-native';
 import FastImage from 'react-native-fast-image';
-import {Edge} from 'react-native-safe-area-context';
+import { Edge } from 'react-native-safe-area-context';
 import ContainerNew from '../../../../common/components/Container';
 import CustomHeader from '../../../../common/components/CustomHeader';
-import {IMAGES} from '../../../../common/constant/Index';
-import {COLORS} from '../../../../common/constant/Themes';
-import {directionFromLatLong} from '../../../../common/services/directionFromLatLong';
+import { IMAGES } from '../../../../common/constant/Index';
+import { COLORS } from '../../../../common/constant/Themes';
+import { directionFromLatLong } from '../../../../common/services/directionFromLatLong';
 import {
   getStatusBgColor,
-  getStatusColor} from '../../../../common/services/getColor';
-import {ListDataEntity} from '../../../../interfaces/attendance/attendance';
+  getStatusColor,
+} from '../../../../common/services/getColor';
+import { ListDataEntity } from '../../../../interfaces/attendance/attendance';
 
-import {useRootStore} from '../../../../stores/rootStore';
+import { useRootStore } from '../../../../stores/rootStore';
 import useAsyncEffect from '../../../../common/packages/useAsyncEffect/useAsyncEffect';
 import {
   GetAllPendingApplicationsForApproval,
-  RemoteAttendanceLocationNDeviceLanding} from '../../../../common/api/api';
-import {httpRequest} from '../../../../common/constant/httpRequest';
-import {commonURL} from '../../../../../App';
+  RemoteAttendanceLocationNDeviceLanding,
+} from '../../../../common/api/api';
+import { httpRequest } from '../../../../common/constant/httpRequest';
+import { commonURL } from '../../../../../App';
 
 const edges: Edge[] = ['right', 'bottom', 'left'];
 
@@ -40,7 +47,7 @@ if (
 
 const LocationAndDeviceApprovalMainIndex = () => {
   const navigation = useNavigation();
-  const {userInfo} = useRootStore();
+  const { userInfo } = useRootStore();
   const [isLoading, setIsLoading] = useState(false);
   const isFocused = useIsFocused();
   const route = useRoute();
@@ -127,9 +134,9 @@ const LocationAndDeviceApprovalMainIndex = () => {
   const handleClicked = (id: number) => {
     const newItems = items.map(item => {
       if (item.id === id) {
-        return {...item, isClicked: true};
+        return { ...item, isClicked: true };
       } else {
-        return {...item, isClicked: false};
+        return { ...item, isClicked: false };
       }
     });
     setItems(newItems);
@@ -150,6 +157,10 @@ const LocationAndDeviceApprovalMainIndex = () => {
               //@ts-ignore
               applicationTypeId: locAndDevApp?.applicationTypeId,
               employeeId: userInfo?.intEmployeeId,
+              isAdmin:
+                (locAndDevApp as any)?.activeTabName === 'adminApproval'
+                  ? true
+                  : false,
               // for common new approval api  v2
             }
           : payloadForLand,
@@ -276,7 +287,8 @@ const LocationAndDeviceApprovalMainIndex = () => {
           title="Location & Device Approval"
         />
       }
-      style={styles.container}>
+      style={styles.container}
+    >
       <View style={styles.headPart}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {items.map((item, index) => (
@@ -289,10 +301,12 @@ const LocationAndDeviceApprovalMainIndex = () => {
                     ? COLORS.primary
                     : COLORS.white,
                 },
-              ]}>
+              ]}
+            >
               <TouchableOpacity
                 disabled={item.isClicked ? true : false}
-                onPress={() => handleClicked(item.id)}>
+                onPress={() => handleClicked(item.id)}
+              >
                 <View style={styles.navStyle}>
                   <Text
                     style={[
@@ -300,7 +314,8 @@ const LocationAndDeviceApprovalMainIndex = () => {
                       item.isClicked
                         ? styles.isClickedFalse
                         : styles.isClickedTrue,
-                    ]}>
+                    ]}
+                  >
                     {item.title}
                   </Text>
                   {/* <Text style={styles.countText}>10</Text> */}
@@ -322,7 +337,8 @@ const LocationAndDeviceApprovalMainIndex = () => {
         <ScrollView
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
-          style={styles.landingPart}>
+          style={styles.landingPart}
+        >
           {items[0]?.isClicked ? (
             <>
               {registerLocaitonData?.map((item, index) => (
@@ -334,7 +350,8 @@ const LocationAndDeviceApprovalMainIndex = () => {
                     })
                   }
                   style={styles.card}
-                  key={index}>
+                  key={index}
+                >
                   <View>
                     <View style={styles.noImageBox}>
                       <FastImage
@@ -378,7 +395,8 @@ const LocationAndDeviceApprovalMainIndex = () => {
                               item?.application?.strStatus,
                             ),
                           },
-                        ]}>
+                        ]}
+                      >
                         <Text
                           style={[
                             styles.statusTxt,
@@ -387,7 +405,8 @@ const LocationAndDeviceApprovalMainIndex = () => {
                                 item?.application?.strStatus,
                               ),
                             },
-                          ]}>
+                          ]}
+                        >
                           {item?.application?.strStatus}
                         </Text>
                       </View>
@@ -417,7 +436,8 @@ const LocationAndDeviceApprovalMainIndex = () => {
                         )
                       }
                       style={styles.card}
-                      key={index}>
+                      key={index}
+                    >
                       <View>
                         <View style={styles.noImageBox}>
                           <FastImage
@@ -443,7 +463,8 @@ const LocationAndDeviceApprovalMainIndex = () => {
                                   item?.application?.strStatus,
                                 ),
                               },
-                            ]}>
+                            ]}
+                          >
                             <Text
                               style={[
                                 styles.statusTxt,
@@ -452,7 +473,8 @@ const LocationAndDeviceApprovalMainIndex = () => {
                                     item?.application?.strStatus,
                                   ),
                                 },
-                              ]}>
+                              ]}
+                            >
                               {item?.application?.strStatus}
                             </Text>
                           </View>
@@ -529,7 +551,7 @@ const styles = StyleSheet.create({
     elevation: 3,
     backgroundColor: COLORS.white,
     shadowColor: COLORS.black,
-    shadowOffset: {width: 0, height: 0},
+    shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
     paddingVertical: 16,
@@ -571,7 +593,7 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     fontSize: 14,
   },
-  image: {width: 130, height: 90},
+  image: { width: 130, height: 90 },
   latLng: {
     flexDirection: 'row',
     paddingVertical: 6,

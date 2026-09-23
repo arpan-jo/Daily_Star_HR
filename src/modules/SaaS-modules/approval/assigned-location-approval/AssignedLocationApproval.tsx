@@ -1,5 +1,9 @@
-import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
-import React, {useEffect, useState} from 'react';
+import {
+  useIsFocused,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
 import {
   Platform,
   ScrollView,
@@ -7,26 +11,29 @@ import {
   Text,
   TouchableOpacity,
   UIManager,
-  View} from 'react-native';
+  View,
+} from 'react-native';
 import FastImage from 'react-native-fast-image';
-import {Edge} from 'react-native-safe-area-context';
+import { Edge } from 'react-native-safe-area-context';
 import ContainerNew from '../../../../common/components/Container';
 import CustomHeader from '../../../../common/components/CustomHeader';
-import {IMAGES} from '../../../../common/constant/Index';
-import {COLORS} from '../../../../common/constant/Themes';
-import {directionFromLatLong} from '../../../../common/services/directionFromLatLong';
+import { IMAGES } from '../../../../common/constant/Index';
+import { COLORS } from '../../../../common/constant/Themes';
+import { directionFromLatLong } from '../../../../common/services/directionFromLatLong';
 import {
   getStatusBgColor,
-  getStatusColor} from '../../../../common/services/getColor';
-import {MasterLocationApprovalType} from '../../../../interfaces/attendance/attendance';
+  getStatusColor,
+} from '../../../../common/services/getColor';
+import { MasterLocationApprovalType } from '../../../../interfaces/attendance/attendance';
 
-import {useRootStore} from '../../../../stores/rootStore';
+import { useRootStore } from '../../../../stores/rootStore';
 import useAsyncEffect from '../../../../common/packages/useAsyncEffect/useAsyncEffect';
-import {httpRequest} from '../../../../common/constant/httpRequest';
-import {commonURL} from '../../../../../App';
+import { httpRequest } from '../../../../common/constant/httpRequest';
+import { commonURL } from '../../../../../App';
 import {
   GetAllPendingApplicationsForApproval,
-  MasterLocationAssaignLandingEngine} from '../../../../common/api/api';
+  MasterLocationAssaignLandingEngine,
+} from '../../../../common/api/api';
 import LoadingContainer from '../../../../common/components/Loading';
 import Row from '../../../../common/components/Row';
 import TopBarItem from '../../../../common/components/TabBaritem';
@@ -55,12 +62,21 @@ const topBarItem = [
 ];
 const AssignedLocationApprovalMain = () => {
   const navigation = useNavigation();
-  const {userInfo} = useRootStore();
+  const { userInfo } = useRootStore();
   const [isLoading, setIsLoading] = useState(false);
   const isFocused = useIsFocused();
   const route = useRoute();
-  const [topBar, setTopBar] = useState(topBarItem);
-  const [activeTabName, setActiveTabName] = useState('commonApproval');
+  // Opens on the tab the approval dashboard was on, so the list matches the
+  // count that was tapped; the tabs below still switch it from here.
+  const initialTabName =
+    (route?.params as any)?.activeTabName || 'commonApproval';
+  const [topBar, setTopBar] = useState(() =>
+    topBarItem.map(tab => ({
+      ...tab,
+      isActive: tab?.nameForApi === initialTabName,
+    })),
+  );
+  const [activeTabName, setActiveTabName] = useState(initialTabName);
 
   const [registerLocaitonData, setRegisterLocationData] =
     useState<MasterLocationApprovalType[]>();
@@ -111,7 +127,7 @@ const AssignedLocationApprovalMain = () => {
       // setRegisterLocationData(res);
       getLandingDataApi();
     },
-    [isFocused],
+    [isFocused, activeTabName],
   );
 
   const getLandingDataApi = async () => {
@@ -206,7 +222,8 @@ const AssignedLocationApprovalMain = () => {
           title="Master Location Approval"
         />
       }
-      style={styles.container}>
+      style={styles.container}
+    >
       <LoadingContainer isLoading={isLoading} />
 
       {userInfo?.strUrl === commonURL && (
@@ -231,7 +248,8 @@ const AssignedLocationApprovalMain = () => {
         <ScrollView
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
-          style={styles.landingPart}>
+          style={styles.landingPart}
+        >
           {registerLocaitonData?.map((item, index) => (
             <TouchableOpacity
               onPress={() =>
@@ -241,7 +259,8 @@ const AssignedLocationApprovalMain = () => {
                 })
               }
               style={styles.card}
-              key={index}>
+              key={index}
+            >
               <View>
                 <View style={styles.noImageBox}>
                   <FastImage source={IMAGES.NoImage} style={styles.noImage} />
@@ -270,14 +289,16 @@ const AssignedLocationApprovalMain = () => {
                       {
                         backgroundColor: getStatusBgColor(item?.strStatus),
                       },
-                    ]}>
+                    ]}
+                  >
                     <Text
                       style={[
                         styles.statusTxt,
                         {
                           color: getStatusColor(item?.strStatus),
                         },
-                      ]}>
+                      ]}
+                    >
                       {item?.strStatus}
                     </Text>
                   </View>
@@ -316,7 +337,7 @@ const styles = StyleSheet.create({
     elevation: 3,
     backgroundColor: COLORS.white,
     shadowColor: COLORS.black,
-    shadowOffset: {width: 0, height: 0},
+    shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
     paddingVertical: 16,
@@ -358,7 +379,7 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     fontSize: 14,
   },
-  image: {width: 130, height: 90},
+  image: { width: 130, height: 90 },
   latLng: {
     flexDirection: 'row',
     paddingVertical: 6,
@@ -409,7 +430,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginTop: 15,
   },
-  paddingBtm: {paddingBottom: 200},
+  paddingBtm: { paddingBottom: 200 },
   toptabstyle: {
     backgroundColor: COLORS.primary,
     flexDirection: 'row',

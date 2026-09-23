@@ -1,36 +1,39 @@
-import NetInfo, {useNetInfo} from '@react-native-community/netinfo';
-import {DrawerScreenProps} from '@react-navigation/drawer';
-import {useIsFocused} from '@react-navigation/native';
-import {observer} from 'mobx-react-lite';
-import React, {useEffect, useState} from 'react';
+import NetInfo, { useNetInfo } from '@react-native-community/netinfo';
+import { DrawerScreenProps } from '@react-navigation/drawer';
+import { useIsFocused } from '@react-navigation/native';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect, useState } from 'react';
 import {
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View} from 'react-native';
+  View,
+} from 'react-native';
 import FastImage from 'react-native-fast-image';
-import {Edge} from 'react-native-safe-area-context';
+import { Edge } from 'react-native-safe-area-context';
 import MIcon from 'react-native-vector-icons/MaterialIcons';
 import {
   GetPendingApprovalDashboard,
   PendingApprovalDashboard,
-  WorkplaceWithRoleExtension} from '../../../common/api/api';
+  WorkplaceWithRoleExtension,
+} from '../../../common/api/api';
 import ContainerNew from '../../../common/components/Container';
 import CustomHeader from '../../../common/components/CustomHeader';
-import {IMAGES} from '../../../common/constant/Index';
-import {COLORS, SIZES} from '../../../common/constant/Themes';
-import {httpRequest} from '../../../common/constant/httpRequest';
+import { IMAGES } from '../../../common/constant/Index';
+import { COLORS, SIZES } from '../../../common/constant/Themes';
+import { httpRequest } from '../../../common/constant/httpRequest';
 import useAsyncEffect from '../../../common/packages/useAsyncEffect/useAsyncEffect';
 import {
   getStatusBgColor,
-  getStatusColor} from '../../../common/services/getColor';
-import {ApprovalMenuType} from '../../../interfaces/approval/approval';
-import {useRootStore} from '../../../stores/rootStore';
-import {commonURL} from '../../../../App';
+  getStatusColor,
+} from '../../../common/services/getColor';
+import { ApprovalMenuType } from '../../../interfaces/approval/approval';
+import { useRootStore } from '../../../stores/rootStore';
+import { commonURL } from '../../../../App';
 import CustomDropDownNew from '../../../common/components/CustomDropDown';
-import {useForm} from 'react-hook-form';
-import {approvalCommonStyle} from './ApprovalMainIndexFromSupDash';
+import { useForm } from 'react-hook-form';
+import { approvalCommonStyle } from './ApprovalMainIndexFromSupDash';
 import Row from '../../../common/components/Row';
 import TopBarItem from '../../../common/components/TabBaritem';
 import LoadingContainer from '../../../common/components/Loading';
@@ -50,9 +53,30 @@ const topBarItem = [
     nameForApi: 'adminApproval',
   },
 ];
+// Approval types handled by a dedicated screen below. Anything else the API
+// returns opens the generic CommonApprovalMainIndex instead of being a dead
+// tap: Increment Proposal (5), Separation (21), Asset Requisition (32),
+// Document Requisition (40).
+const handledApplicationTypeIds = [
+  3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 20,
+];
+const handledPipelineCodes = [
+  'BABBAPBANDNQNARQ',
+  'BABBAPBANDNQNNAO',
+  'BABBAPBANDNQNNAP',
+  'BABBAPBANDNQNNAQ',
+  'BABBAPBANDNQNBQC',
+  'BABBAPBANDNQNBQP',
+  'BABBAPBANDNQNONP',
+  'BABBAPBANDNQNONC',
+  'BABBAPBANDNQNNAC',
+  'BABBAPBANDNQNOBE',
+  'BABBAPBANDNQNOND',
+  'BABBAPBANDNQNOPR',
+];
 const ApprovalMainIndex = observer<DrawerScreenProps<'Approval'>>(
-  ({navigation}) => {
-    const {userInfo, userInfoSave} = useRootStore();
+  ({ navigation }) => {
+    const { userInfo, userInfoSave } = useRootStore();
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadAgain, setIsLoadAgain] = useState(false);
     const isFoucused = useIsFocused();
@@ -60,7 +84,11 @@ const ApprovalMainIndex = observer<DrawerScreenProps<'Approval'>>(
     const [selectedWorkplaceId, setSelectedWorkplaceId] = useState<any[]>();
     const [topBar, setTopBar] = useState(topBarItem);
     const netInfo = useNetInfo();
-    const {control, setValue, reset} = useForm();
+    const { control, setValue, reset } = useForm();
+    // The tab the user is on decides whether the opened list is the common or
+    // the admin scope, so it travels with every navigate.
+    const activeTabName =
+      topBar?.find(tab => tab?.isActive)?.nameForApi || 'commonApproval';
 
     const handleTopBar = (ind: any) => {
       const mod = [...topBar];
@@ -98,7 +126,7 @@ const ApprovalMainIndex = observer<DrawerScreenProps<'Approval'>>(
         getMenuData();
         getWorkplaceData();
       },
-      [isFoucused, isLoadAgain, topBar, userInfo?.intWorkplaceGroupId],
+      [isFoucused, isLoadAgain, topBar],
     );
     console.log('workplace id', selectedWorkplaceId);
     useAsyncEffect(
@@ -236,6 +264,19 @@ const ApprovalMainIndex = observer<DrawerScreenProps<'Approval'>>(
       if (item?.applicationTypeId === 20) {
         return 'money';
       }
+      if (item?.applicationTypeId === 5) {
+        return 'trending-up';
+      }
+      if (item?.applicationTypeId === 21) {
+        return 'upcoming';
+      }
+      if (item?.applicationTypeId === 32) {
+        return 'inventory';
+      }
+      if (item?.applicationTypeId === 40) {
+        return 'description';
+      }
+      return 'assignment';
     };
 
     const getWorkplaceData = async () => {
@@ -266,6 +307,8 @@ const ApprovalMainIndex = observer<DrawerScreenProps<'Approval'>>(
       }
     };
 
+    console.log('approvalMenu ----', approvalMenu);
+
     return (
       <ContainerNew
         isRefresh={false}
@@ -273,14 +316,11 @@ const ApprovalMainIndex = observer<DrawerScreenProps<'Approval'>>(
         header={
           <CustomHeader
             onLeftMenuPress={navigation.toggleDrawer}
-            isSubtitleClickable={commonURL === userInfo?.strUrl}
-            subtitle={
-              commonURL === userInfo?.strUrl ? userInfo?.strWorkplaceGroup : ''
-            }
             title="Approval"
           />
         }
-        style={styles.container}>
+        style={styles.container}
+      >
         <LoadingContainer isLoading={isLoading} />
         <Row style={styles.toptabstyle}>
           {topBar?.map(
@@ -296,7 +336,7 @@ const ApprovalMainIndex = observer<DrawerScreenProps<'Approval'>>(
           )}
         </Row>
         <View style={styles.bodyContainer}>
-          <View style={{height: 50, marginBottom: 10}}>
+          <View style={{ height: 50, marginBottom: 10 }}>
             <CustomDropDownNew
               control={control}
               data={selectedWorkplaceId}
@@ -313,13 +353,14 @@ const ApprovalMainIndex = observer<DrawerScreenProps<'Approval'>>(
                 userInfoSave(updtedLoginInfo);
                 setIsLoadAgain(true);
               }}
-              rules={{required: true}}
+              rules={{ required: true }}
             />
           </View>
 
           <ScrollView
             showsVerticalScrollIndicator={false}
-            showsHorizontalScrollIndicator={false}>
+            showsHorizontalScrollIndicator={false}
+          >
             <View>
               {approvalMenu?.length > 0 ? (
                 approvalMenu?.map((item, index) => (
@@ -329,19 +370,28 @@ const ApprovalMainIndex = observer<DrawerScreenProps<'Approval'>>(
                         item?.pipelineCode === 'BABBAPBANDNQNARQ' ||
                         item?.applicationTypeId === 8
                       ) {
-                        navigation.navigate('LeaveApprovalMainIndex', item);
+                        navigation.navigate('LeaveApprovalMainIndex', {
+                          ...item,
+                          activeTabName,
+                        });
                       }
                       if (
                         item?.pipelineCode === 'BABBAPBANDNQNNAO' ||
                         item?.applicationTypeId === 14
                       ) {
-                        navigation.navigate('MovementApprovalMainIndex', item);
+                        navigation.navigate('MovementApprovalMainIndex', {
+                          ...item,
+                          activeTabName,
+                        });
                       }
                       if (
                         item?.pipelineCode === 'BABBAPBANDNQNNAQ' ||
                         item?.applicationTypeId === 9
                       ) {
-                        navigation.navigate('LoanApprovalMainIndex', item);
+                        navigation.navigate('LoanApprovalMainIndex', {
+                          ...item,
+                          activeTabName,
+                        });
                       }
                       if (
                         item?.pipelineCode === 'BABBAPBANDNQNONP' ||
@@ -349,7 +399,7 @@ const ApprovalMainIndex = observer<DrawerScreenProps<'Approval'>>(
                       ) {
                         navigation.navigate(
                           'RemoteAttendanceApprovalMainIndex',
-                          item,
+                          { ...item, activeTabName },
                         );
                       }
                       if (
@@ -362,13 +412,26 @@ const ApprovalMainIndex = observer<DrawerScreenProps<'Approval'>>(
                         item?.pipelineCode === 'BABBAPBANDNQNBQP' ||
                         item?.applicationTypeId === 7
                       ) {
-                        navigation.navigate('IOUAdjustmentApprovalMainIndex');
+                        // The dedicated screen only knows the old pipeline
+                        // API, so v2 lists (common/admin scope) open the
+                        // common approval screen instead.
+                        if (commonURL === userInfo?.strUrl) {
+                          navigation.navigate('CommonApprovalMainIndex', {
+                            ...item,
+                            activeTabName,
+                          });
+                        } else {
+                          navigation.navigate('IOUAdjustmentApprovalMainIndex');
+                        }
                       }
                       if (
                         item?.pipelineCode === 'BABBAPBANDNQNBQC' ||
                         item?.applicationTypeId === 6
                       ) {
-                        navigation.navigate('IOUApprovalMainIndex', item);
+                        navigation.navigate('IOUApprovalMainIndex', {
+                          ...item,
+                          activeTabName,
+                        });
                       }
                       if (
                         item?.pipelineCode === 'BABBAPBANDNQNNAC' ||
@@ -376,7 +439,7 @@ const ApprovalMainIndex = observer<DrawerScreenProps<'Approval'>>(
                       ) {
                         navigation.navigate(
                           'AttendanceAdjustmentApprovalMainIndex',
-                          item,
+                          { ...item, activeTabName },
                         );
                       }
                       if (
@@ -385,17 +448,17 @@ const ApprovalMainIndex = observer<DrawerScreenProps<'Approval'>>(
                       ) {
                         navigation.navigate(
                           'LocationAndDeviceApprovalMainIndex',
-                          item,
+                          { ...item, activeTabName },
                         );
                       }
                       if (
                         item?.pipelineCode === 'BABBAPBANDNQNOBE' ||
                         item?.applicationTypeId === 12
                       ) {
-                        navigation.navigate(
-                          'MarketVisitApprovalMainIndex',
-                          item,
-                        );
+                        navigation.navigate('MarketVisitApprovalMainIndex', {
+                          ...item,
+                          activeTabName,
+                        });
                       }
                       if (
                         item?.pipelineCode === 'BABBAPBANDNQNOND' ||
@@ -407,29 +470,44 @@ const ApprovalMainIndex = observer<DrawerScreenProps<'Approval'>>(
                         item?.pipelineCode === 'BABBAPBANDNQNOPR' ||
                         item?.applicationTypeId === 13
                       ) {
-                        navigation.navigate(
-                          'AssignedLocationApprovalMain',
-                          item,
-                        );
+                        navigation.navigate('AssignedLocationApprovalMain', {
+                          ...item,
+                          activeTabName,
+                        });
                       }
                       if (
                         // item?.pipelineCode === 'BABBAPBANDNQNOPR' ||
                         item?.applicationTypeId === 4
                       ) {
-                        navigation.navigate('IncrementApprovalMainIndex', item);
+                        navigation.navigate('IncrementApprovalMainIndex', {
+                          ...item,
+                          activeTabName,
+                        });
                       }
                       if (
                         // item?.pipelineCode === 'BABBAPBANDNQNOPR' ||
                         item?.applicationTypeId === 20
                       ) {
-                        navigation.navigate(
-                          'SalaryGenerateApprovalMainIndex',
-                          item,
-                        );
+                        navigation.navigate('SalaryGenerateApprovalMainIndex', {
+                          ...item,
+                          activeTabName,
+                        });
+                      }
+                      if (
+                        !handledApplicationTypeIds.includes(
+                          item?.applicationTypeId,
+                        ) &&
+                        !handledPipelineCodes.includes(item?.pipelineCode)
+                      ) {
+                        navigation.navigate('CommonApprovalMainIndex', {
+                          ...item,
+                          activeTabName,
+                        });
                       }
                     }}
                     key={index?.toString()}
-                    style={styles.leaveCard}>
+                    style={styles.leaveCard}
+                  >
                     <View style={styles.leaveTextPart}>
                       <View style={styles.iconPart}>
                         <MIcon
@@ -456,7 +534,8 @@ const ApprovalMainIndex = observer<DrawerScreenProps<'Approval'>>(
                             color: getStatusColor('Approved'),
                             backgroundColor: getStatusBgColor('Approved'),
                           },
-                        ]}>
+                        ]}
+                      >
                         {commonURL === userInfo?.strUrl
                           ? item?.pendingApprovalCount ||
                             item?.totalCount ||
@@ -520,9 +599,9 @@ const styles = StyleSheet.create({
   paddingBottom: {
     paddingBottom: 200,
   },
-  paddingLeft: {paddingLeft: 8},
-  alignCenter: {alignSelf: 'center'},
-  fastImg: {width: 130, height: 90},
+  paddingLeft: { paddingLeft: 8 },
+  alignCenter: { alignSelf: 'center' },
+  fastImg: { width: 130, height: 90 },
   toptabstyle: {
     backgroundColor: COLORS.primary,
     flexDirection: 'row',
