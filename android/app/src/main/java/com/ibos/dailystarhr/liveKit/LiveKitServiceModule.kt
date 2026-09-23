@@ -1,4 +1,4 @@
-package com.ibos.dailystarhr.liveKit
+package net.thedailystar.liveKit
 
 import android.content.BroadcastReceiver
 import android.content.Context

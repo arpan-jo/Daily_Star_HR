@@ -1,4 +1,4 @@
-package com.ibos.dailystarhr
+package net.thedailystar
 
 import android.app.AlarmManager
 import android.content.Intent

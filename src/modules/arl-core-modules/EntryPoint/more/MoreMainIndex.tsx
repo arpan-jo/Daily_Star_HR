@@ -230,7 +230,7 @@ const HRMoreMainIndex = () => {
           title={t('more.rateApp')}
           onPress={() =>
             Linking.openURL(
-              'https://play.google.com/store/apps/details?id=com.ibos.dailystarhr',
+              'https://play.google.com/store/apps/details?id=net.thedailystar',
             )
           }
         />

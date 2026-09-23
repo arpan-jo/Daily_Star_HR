@@ -1,4 +1,4 @@
-package com.ibos.dailystarhr
+package net.thedailystar
 
 import android.util.Log
 import org.eclipse.paho.client.mqttv3.*

@@ -1,4 +1,4 @@
-package com.ibos.dailystarhr
+package net.thedailystar
 
 import android.app.PendingIntent
 import android.content.*
@@ -134,7 +134,7 @@ class UnifiedMotionActivityModule(private val reactContext: ReactApplicationCont
             activityClient = ActivityRecognition.getClient(reactContext)
             
             val intent = Intent(reactContext, SmoothActivityReceiver::class.java).apply {
-                action = "com.ibos.dailystarhr.ACTIVITY_RECOGNITION"
+                action = "net.thedailystar.ACTIVITY_RECOGNITION"
             }
             
             val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {

@@ -1,4 +1,4 @@
-package com.ibos.dailystarhr
+package net.thedailystar
 
 import android.Manifest
 import android.annotation.SuppressLint

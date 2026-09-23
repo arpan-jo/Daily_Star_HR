@@ -1,4 +1,4 @@
-package com.ibos.dailystarhr
+package net.thedailystar // replace your-app-name with your app’s name
 import com.facebook.react.ReactPackage
 import com.facebook.react.bridge.NativeModule
 import com.facebook.react.bridge.ReactApplicationContext

@@ -101,14 +101,14 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.ibos.dailystarhr"
+    namespace "net.thedailystar"
 
     buildFeatures {
         buildConfig = true
     }
 
     defaultConfig {
-        applicationId "com.ibos.dailystarhr"
+        applicationId "net.thedailystar"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 443

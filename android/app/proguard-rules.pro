@@ -11,7 +11,7 @@
 
 # React Native native modules (RN's own consumer rules cover core; these keep
 # this app's bridge modules reachable from JS by name).
--keep class com.ibos.dailystarhr.** { *; }
+-keep class net.thedailystar.** { *; }
 -keep class com.printer.**, com.security.**, com.stepcounter.**, com.voice.**, com.voip.** { *; }
 
 # Paho MQTT — ships no consumer rules, uses reflection for persistence/callbacks.

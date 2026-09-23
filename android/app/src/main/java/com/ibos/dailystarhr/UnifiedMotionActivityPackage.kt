@@ -1,4 +1,4 @@
-package com.ibos.dailystarhr
+package net.thedailystar
 
 
 import com.facebook.react.ReactPackage

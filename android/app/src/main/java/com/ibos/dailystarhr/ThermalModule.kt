@@ -1,4 +1,4 @@
-package com.ibos.dailystarhr
+package net.thedailystar // replace com.your-app-name with your app’s name
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothHeadset
 import android.graphics.Bitmap
