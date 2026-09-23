@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Animated,
   StyleSheet,
@@ -73,6 +73,25 @@ const FaceCaptureForRemoteAttandance = ({
   onSuccessDismissRef.current = onSuccessDismiss;
   const onErrorDismissRef = useRef(onErrorDismiss);
   onErrorDismissRef.current = onErrorDismiss;
+  // Same idiom, so the capture path below can keep a stable identity.
+  const onFaceCapturedRef = useRef(onFaceCaptured);
+  onFaceCapturedRef.current = onFaceCaptured;
+  const onErrorRef = useRef(onError);
+  onErrorRef.current = onError;
+  // Mirrors faceDetected so the per-frame handler can skip redundant dispatches.
+  const faceDetectedRef = useRef(false);
+
+  // Cancelling inside the 2.5s stable window unmounts this screen with the
+  // capture still pending.
+  useEffect(
+    () => () => {
+      if (stableTimerRef.current) {
+        clearTimeout(stableTimerRef.current);
+        stableTimerRef.current = null;
+      }
+    },
+    [],
+  );
 
   const faceDetectionOptions = useRef<FrameFaceDetectionOptions>({
     performanceMode: 'fast',
@@ -167,35 +186,14 @@ const FaceCaptureForRemoteAttandance = ({
     const timer = setTimeout(() => {
       capturingRef.current = false;
       setIsCapturing(false);
+      faceDetectedRef.current = false;
       setFaceDetected(false);
       onErrorDismissRef.current?.();
     }, 3000);
     return () => clearTimeout(timer);
   }, [verificationFailed, animateResultIn]);
 
-  const handleFacesDetected = (faces: Face[], _frame: any) => {
-    if (capturingRef.current || isVerifying || showingResult) return;
-
-    if (faces.length === 0) {
-      setFaceDetected(false);
-      if (stableTimerRef.current) {
-        clearTimeout(stableTimerRef.current);
-        stableTimerRef.current = null;
-      }
-      return;
-    }
-
-    setFaceDetected(true);
-
-    if (!stableTimerRef.current) {
-      stableTimerRef.current = setTimeout(() => {
-        stableTimerRef.current = null;
-        capturePhoto();
-      }, STABLE_MS);
-    }
-  };
-
-  const capturePhoto = async () => {
+  const capturePhoto = useCallback(async () => {
     if (capturingRef.current || !camera.current) return;
     capturingRef.current = true;
     setIsCapturing(true);
@@ -204,19 +202,61 @@ const FaceCaptureForRemoteAttandance = ({
       const cleanPath = path.startsWith('file://') ? path.replace('file://', '') : path;
       const readPath = Platform.OS === 'ios' ? cleanPath : `file://${cleanPath}`;
       const base64 = await RNFS.readFile(readPath, 'base64');
-      onFaceCaptured(`data:image/jpeg;base64,${base64}`);
+      // Every capture, including every retry after a failed verification,
+      // wrote a full-resolution JPEG into the cache dir and left it there.
+      RNFS.unlink(cleanPath).catch(() => {});
+      onFaceCapturedRef.current(`data:image/jpeg;base64,${base64}`);
     } catch (err) {
       console.log('Capture error:', err);
       capturingRef.current = false;
       setIsCapturing(false);
-      onError('Failed to capture photo');
+      onErrorRef.current('Failed to capture photo');
     }
-  };
+  }, []);
 
-  const scanTranslateY = scanAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [-(FRAME_H / 2), FRAME_H / 2],
-  });
+  // Identity must stay stable: CameraWrapper memoizes the worklet bridge and
+  // the frame processor on this callback, so a new function on every render
+  // rebuilds both. The parent re-renders on every GPS tick.
+  const handleFacesDetected = useCallback(
+    (faces: Face[], _frame: any) => {
+      if (capturingRef.current || isVerifying || showingResult) return;
+
+      if (faces.length === 0) {
+        // Only dispatch on change; this runs once per frame (~30/s).
+        if (faceDetectedRef.current) {
+          faceDetectedRef.current = false;
+          setFaceDetected(false);
+        }
+        if (stableTimerRef.current) {
+          clearTimeout(stableTimerRef.current);
+          stableTimerRef.current = null;
+        }
+        return;
+      }
+
+      if (!faceDetectedRef.current) {
+        faceDetectedRef.current = true;
+        setFaceDetected(true);
+      }
+
+      if (!stableTimerRef.current) {
+        stableTimerRef.current = setTimeout(() => {
+          stableTimerRef.current = null;
+          capturePhoto();
+        }, STABLE_MS);
+      }
+    },
+    [isVerifying, showingResult, capturePhoto],
+  );
+
+  const scanTranslateY = useMemo(
+    () =>
+      scanAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: [-(FRAME_H / 2), FRAME_H / 2],
+      }),
+    [scanAnim],
+  );
 
   if (!device) {
     return (
@@ -248,7 +288,9 @@ const FaceCaptureForRemoteAttandance = ({
         // @ts-ignore
         ref={camera}
         style={StyleSheet.absoluteFill}
-        isActive={isFocused && !verifiedEmployeeName}
+        // Also idle while verifying / showing the error overlay, otherwise the
+        // ML Kit frame processor keeps running through the whole round trip.
+        isActive={isFocused && !showingResult && !isVerifying}
         device={device}
         photo={true}
         faceDetectionCallback={handleFacesDetected}
@@ -541,4 +583,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FaceCaptureForRemoteAttandance;
+export default React.memo(FaceCaptureForRemoteAttandance);
