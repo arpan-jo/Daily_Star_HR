@@ -34,7 +34,6 @@ import {
 import { arlURL } from '../../../App';
 import {
   GetVisitingCardDataByEmployeeId,
-  SendPushNotification,
 } from '../../common/api/api';
 import ContainerNew from '../../common/components/Container';
 import CustomButtonNew from '../../common/components/CustomButton';
@@ -64,11 +63,7 @@ import {
   getSwitchBoardData,
 } from '../../services/SaaS-modules/contact/contact';
 import { useRootStore } from '../../stores/rootStore';
-// import {endCall, makeCall, sessionCancel} from './sip_service/SipService';
-import VoipCallModal from './voip-call-modal/VoipCallModal';
 import MapLocModal from '../../common/components/MapLocModal';
-
-const { VoIPServiceModule: _VoIPServiceModule } = NativeModules || {};
 
 const edges: Edge[] = ['right', 'bottom', 'left'];
 const edgess: Edge[] = ['right', 'left', 'top'];
@@ -142,9 +137,7 @@ const EmployeeDirectoryNew = () => {
   const [contactLandingData, setContactLandingData] = useState([]);
   const [switchBoardData, setSwitchBoardData] = useState();
   const [modalVisible, setModalVisible] = useState(false);
-  const [isCallStart, setIsCallStart] = useState(false); //for ios calling modal
   const currentTime = dayjs().format('h:mm A');
-  const [callerName, setCallerName] = useState('');
   const { control, handleSubmit, setValue, reset } = useForm({
     defaultValues: {
       agendaOfMeetMe: 'Come to meet me now',
@@ -273,75 +266,6 @@ const EmployeeDirectoryNew = () => {
     [modalVisible],
   );
 
-  const handleCall = async (target: any, name: string) => {
-    setIsCallStart(true);
-    setCallerName(name);
-    const api_params = {
-      url: SendPushNotification,
-      data: {
-        deviceId: '',
-        title: '',
-        body: '',
-        sound: '',
-        soundIOS: '',
-        channelId: '',
-        name: '',
-        uuid: `${userInfo?.extensionNumber}`,
-        handle: name,
-        callerName: name,
-        caller: `${target}`,
-        employeeId: target,
-      },
-      method: 'post',
-    };
-    const _res = await httpRequest(api_params, () => {});
-    const intervalId = setInterval(async () => {
-      const resStatus = await getExtensionStatus(target);
-      if (userInfo?.extensionNumber && resStatus?.status == 'OK') {
-        setIsCallStart(false);
-        setCallerName('');
-        clearInterval(intervalId);
-        // makeCall(target?.toString(), name, '');
-      } else if (!userInfo?.extensionNumber) {
-        toaster.show({ message: 'Register the Voip first.', type: 'warning' });
-      }
-      console.log(JSON.stringify(resStatus, null, 2));
-    }, 3000);
-
-    setTimeout(() => {
-      clearInterval(intervalId);
-      setIsCallStart(false);
-      setCallerName('');
-      console.log('Stopped calling API.');
-    }, 50000);
-  };
-
-  const getExtensionStatus = async (extension: any) => {
-    const url = `http://119.148.58.252/api/extension_status.php?extension=${extension}`;
-    const username = 'spark'; // Replace with actual username
-    const password = 'ibos929'; // Replace with actual password
-    const authHeader =
-      'Basic ' + Buffer.from(`${username}:${password}`).toString('base64');
-
-    try {
-      console.log(url);
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: { Authorization: authHeader },
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error(
-        'Error fetching extension status:',
-        JSON.stringify(error, null, 2),
-      );
-      return error;
-    }
-  };
 
   const handleSkillTabApi = async () => {
     const data = await getEmployeeSkillCategoryList(
@@ -2320,15 +2244,6 @@ const EmployeeDirectoryNew = () => {
         </View>
       </Modal>
 
-      <VoipCallModal
-        visible={isCallStart} //true or false
-        // onAccept={() => console.log('call accept')}
-        onReject={() => {
-          // endCall();
-          setIsCallStart(false);
-        }}
-        callerName={callerName}
-      />
 
       <MapLocModal
         modalShow={modalShow}

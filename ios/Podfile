@@ -58,5 +58,20 @@ target 'PeopleDesk' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |c|
+        c.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = ""
+      end
+    end
+    system("python3 -c \"
+import glob
+for xc in glob.glob('Pods/Target Support Files/**/*.xcconfig', recursive=True):
+    with open(xc, 'r') as f:
+        content = f.read()
+    if 'EXCLUDED_ARCHS[sdk=iphonesimulator*] = arm64' in content:
+        with open(xc, 'w') as f:
+            f.write(content.replace('EXCLUDED_ARCHS[sdk=iphonesimulator*] = arm64', ''))
+\"")
+    system("./prepare_mlkit.sh")
   end
 end
