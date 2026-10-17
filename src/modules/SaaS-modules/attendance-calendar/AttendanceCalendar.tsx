@@ -133,30 +133,42 @@ const AttendanceCalendarIndex = ({
     },
   });
 
-  useAsyncEffect(async isMounted => {
-    if (!isMounted()) {
-      return;
-    }
-    const api_params = {
-      url: GetAttendanceSummary,
-      data: {
-        employeeId: userInfo?.intEmployeeId,
-        typeId: watch('calerdarType.value'),
-      },
-    };
-    const res = await httpRequest(api_params, () => {});
-    const dayName = dayjs(
-      res?.attendanceDailySummaryViewModel?.[0]?.dteDate,
-    ).day();
+  useAsyncEffect(
+    async isMounted => {
+      // Lay out the current month's dates straight away, so the grid is never
+      // empty while the summary loads, or when it comes back without days.
+      const today = dayjs();
+      blankDayProcess(today.startOf('month').day());
+      allDayProcess(today.daysInMonth());
 
-    blankDayProcess(dayName);
-
-    allDayProcess(res?.attendanceDailySummaryViewModel?.length);
-    setAllDayDetailsData(res);
-    if (userInfo?.strUrl === arlURL) {
-      getMettingRoomData();
-    }
-  }, []);
+      // The persisted user store may not be hydrated on first mount; this
+      // effect re-runs once the employee id arrives.
+      if (!userInfo?.intEmployeeId) {
+        return;
+      }
+      const api_params = {
+        url: GetAttendanceSummary,
+        data: {
+          employeeId: userInfo?.intEmployeeId,
+          typeId: watch('calerdarType.value'),
+        },
+      };
+      const res = await httpRequest(api_params, () => {});
+      if (!isMounted()) {
+        return;
+      }
+      const days = res?.attendanceDailySummaryViewModel;
+      if (days?.[0]?.dteDate) {
+        blankDayProcess(dayjs(days[0].dteDate).day());
+        allDayProcess(days.length);
+      }
+      setAllDayDetailsData(res);
+      if (userInfo?.strUrl === arlURL) {
+        getMettingRoomData();
+      }
+    },
+    [userInfo?.intEmployeeId],
+  );
 
   useAsyncEffect(async isMounted => {
     if (!isMounted()) {
@@ -824,7 +836,6 @@ const AttendanceCalendarIndex = ({
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 width: '100%',
-              
               }}
             >
               <View
@@ -832,7 +843,6 @@ const AttendanceCalendarIndex = ({
                   flexDirection: 'row',
                   alignItems: 'center',
                   width: '70%',
-                 
                 }}
               >
                 <View>
@@ -988,8 +998,7 @@ const AttendanceCalendarIndex = ({
                   right: 0,
                   paddingTop: Platform.OS === 'ios' ? 10 : 0,
                   alignSelf: 'flex-end',
-                  justifyContent:"flex-end",
-                  
+                  justifyContent: 'flex-end',
                 }}
               >
                 <CustomDropDownNew
