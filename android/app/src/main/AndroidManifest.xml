@@ -92,7 +92,7 @@
             android:exported="false"
             android:enabled="true" />
 
-        <service
+        <!-- <service
             android:name="io.wazo.callkeep.VoiceConnectionService"
             android:exported="true"
             android:foregroundServiceType="camera|microphone|mediaProjection"
@@ -102,11 +102,11 @@
             <intent-filter>
                 <action android:name="android.telecom.ConnectionService" />
             </intent-filter>
-        </service>
+        </service> -->
 
-        <service
+        <!-- <service
             android:name="io.wazo.callkeep.RNCallKeepBackgroundMessagingService"
-            android:exported="true" />
+            android:exported="true" /> -->
 
         <uses-library
             android:name="org.apache.http.legacy"
