@@ -1,8 +1,16 @@
 import React from 'react';
 import { Platform } from 'react-native';
-import { Camera as RNCamera, useFrameProcessor } from 'react-native-vision-camera';
-import { useFaceDetector } from 'react-native-vision-camera-face-detector';
-import { Worklets, useSharedValue } from 'react-native-worklets-core';
+import { Camera as RNCamera } from 'react-native-vision-camera';
+
+// FACE DETECTOR DISABLED: the project doesn't need it right now.
+// To re-enable:
+//   1. Uncomment the imports below and the "FACE DETECTOR (disabled)" blocks in
+//      this file (and drop `useFrameProcessor` back into the vision-camera import).
+//   2. Remove the face detector entry from react-native.config.js.
+//   3. Run `yarn pod` (and rebuild Android).
+// import { useFrameProcessor } from 'react-native-vision-camera';
+// import { useFaceDetector } from 'react-native-vision-camera-face-detector';
+// import { Worklets, useSharedValue } from 'react-native-worklets-core';
 
 // Types mapping to match the original face detector structure
 export interface Face {
@@ -35,8 +43,9 @@ interface CameraWrapperProps extends React.ComponentProps<typeof RNCamera> {
 }
 
 export const Camera = React.forwardRef<any, CameraWrapperProps>(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ({ faceDetectionOptions, faceDetectionCallback, ...props }, ref) => {
-    const isAsyncContextBusy = useSharedValue(false);
+    // const isAsyncContextBusy = useSharedValue(false); // FACE DETECTOR (disabled)
     const cameraRef = React.useRef<RNCamera>(null);
 
     React.useImperativeHandle(ref, () => ({
@@ -58,63 +67,65 @@ export const Camera = React.forwardRef<any, CameraWrapperProps>(
       },
     }), []);
 
-    const faceDetectorOptionsObj = React.useMemo(() => ({
-      performanceMode: faceDetectionOptions?.performanceMode ?? 'fast',
-      classificationMode: faceDetectionOptions?.classificationMode ?? 'none',
-      landmarkMode: faceDetectionOptions?.landmarkMode ?? 'none',
-      contourMode: faceDetectionOptions?.contourMode ?? 'none',
-      minFaceSize: faceDetectionOptions?.minFaceSize ?? 0.15,
-      trackingEnabled: faceDetectionOptions?.trackingEnabled ?? false,
-    }), [faceDetectionOptions]);
+    // --- FACE DETECTOR (disabled) start ---
+    // const faceDetectorOptionsObj = React.useMemo(() => ({
+      // performanceMode: faceDetectionOptions?.performanceMode ?? 'fast',
+      // classificationMode: faceDetectionOptions?.classificationMode ?? 'none',
+      // landmarkMode: faceDetectionOptions?.landmarkMode ?? 'none',
+      // contourMode: faceDetectionOptions?.contourMode ?? 'none',
+      // minFaceSize: faceDetectionOptions?.minFaceSize ?? 0.15,
+      // trackingEnabled: faceDetectionOptions?.trackingEnabled ?? false,
+    // }), [faceDetectionOptions]);
 
-    const { detectFaces } = useFaceDetector(faceDetectorOptionsObj);
+    // const { detectFaces } = useFaceDetector(faceDetectorOptionsObj);
 
-    // Run callback on JS thread
-    const runOnJs = React.useMemo(
-      () => Worklets.createRunOnJS(faceDetectionCallback),
-      [faceDetectionCallback]
-    );
+    // // Run callback on JS thread
+    // const runOnJs = React.useMemo(
+      // () => Worklets.createRunOnJS(faceDetectionCallback),
+      // [faceDetectionCallback]
+    // );
 
-    // Frame Processor logic using face-detector
-    const frameProcessor = useFrameProcessor((frame) => {
-      'worklet';
-      if (isAsyncContextBusy.value) return;
-      isAsyncContextBusy.value = true;
+    // // Frame Processor logic using face-detector
+    // const frameProcessor = useFrameProcessor((frame) => {
+      // 'worklet';
+      // if (isAsyncContextBusy.value) return;
+      // isAsyncContextBusy.value = true;
 
-      try {
-        const detected = detectFaces(frame) ?? [];
+      // try {
+        // const detected = detectFaces(frame) ?? [];
 
-        // Map returning properties to ensure compatibility with old library
-        const mappedFaces: Face[] = detected.map((face: any) => {
-          return {
-            pitchAngle: face.pitchAngle ?? 0,
-            rollAngle: face.rollAngle ?? 0,
-            yawAngle: face.yawAngle ?? 0,
-            bounds: face.bounds,
-            leftEyeOpenProbability: face.leftEyeOpenProbability ?? 0,
-            rightEyeOpenProbability: face.rightEyeOpenProbability ?? 0,
-            smilingProbability: face.smilingProbability ?? 0,
-          };
-        });
+        // // Map returning properties to ensure compatibility with old library
+        // const mappedFaces: Face[] = detected.map((face: any) => {
+          // return {
+            // pitchAngle: face.pitchAngle ?? 0,
+            // rollAngle: face.rollAngle ?? 0,
+            // yawAngle: face.yawAngle ?? 0,
+            // bounds: face.bounds,
+            // leftEyeOpenProbability: face.leftEyeOpenProbability ?? 0,
+            // rightEyeOpenProbability: face.rightEyeOpenProbability ?? 0,
+            // smilingProbability: face.smilingProbability ?? 0,
+          // };
+        // });
 
-        (frame as any).incrementRefCount();
+        // (frame as any).incrementRefCount();
 
-        runOnJs(mappedFaces, frame).finally(() => {
-          'worklet';
-          (frame as any).decrementRefCount();
-        });
-      } catch (error) {
-        console.error('Face detection execution error:', error);
-      } finally {
-        isAsyncContextBusy.value = false;
-      }
-    }, [detectFaces, runOnJs]);
+        // runOnJs(mappedFaces, frame).finally(() => {
+          // 'worklet';
+          // (frame as any).decrementRefCount();
+        // });
+      // } catch (error) {
+        // console.error('Face detection execution error:', error);
+      // } finally {
+        // isAsyncContextBusy.value = false;
+      // }
+    // }, [detectFaces, runOnJs]);
+    // --- FACE DETECTOR (disabled) end ---
 
     return (
       <RNCamera
         {...props}
         ref={cameraRef}
-        frameProcessor={frameProcessor}
+        // frameProcessor={frameProcessor} // FACE DETECTOR (disabled)
         pixelFormat="yuv"
       />
     );
