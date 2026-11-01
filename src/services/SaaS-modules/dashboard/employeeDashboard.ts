@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { Platform } from 'react-native';
+import RNFetchBlob from 'react-native-blob-util';
 import {
   readProfileCache,
   writeProfileCache,
@@ -208,6 +210,65 @@ export const getEmployeeSalaryPayslipHtml = async (
   } catch {
     return '';
   }
+};
+
+/**
+ * Downloads the payslip PDF (Type=pdfView) with the session's auth headers.
+ * Android hands it to the system DownloadManager (Downloads folder + notification);
+ * iOS saves it to the app's Documents and opens the preview / share sheet.
+ * Resolves to the saved file path; rejects if the download fails.
+ */
+export const downloadEmployeeSalaryPayslipPdf = async (
+  empId: number,
+  monthId: number,
+  yearId: number,
+  salaryGenerateRequestId: number,
+): Promise<string> => {
+  const url = `${axios.defaults.baseURL}/PdfAndExcelReport/EmployeeSalaryPayslip?Type=pdfView&EmployeeId=${empId}&MonthId=${monthId}&YearId=${yearId}&SalaryGenerateRequestId=${salaryGenerateRequestId}`;
+
+  const headers: Record<string, string> = {};
+  Object.entries(axios.defaults.headers.common || {}).forEach(
+    ([key, value]) => {
+      if (typeof value === 'string') {
+        headers[key] = value;
+      }
+    },
+  );
+
+  const { config, fs, ios } = RNFetchBlob;
+  const fileName = `Payslip_${empId}_${yearId}_${String(monthId).padStart(
+    2,
+    '0',
+  )}.pdf`;
+
+  if (Platform.OS === 'android') {
+    const res = await config({
+      addAndroidDownloads: {
+        useDownloadManager: true,
+        notification: true,
+        mediaScannable: true,
+        mime: 'application/pdf',
+        title: fileName,
+        description: 'Payslip',
+        path: `${fs.dirs.LegacyDownloadDir}/${fileName}`,
+      },
+    }).fetch('GET', url, headers);
+    return res.path();
+  }
+
+  const path = `${fs.dirs.DocumentDir}/${fileName}`;
+  const res = await config({ fileCache: true, path }).fetch(
+    'GET',
+    url,
+    headers,
+  );
+  const status = res.info().status;
+  if (status < 200 || status >= 300) {
+    await fs.unlink(path).catch(() => undefined);
+    throw new Error(`Payslip download failed (${status})`);
+  }
+  ios.previewDocument(res.path());
+  return res.path();
 };
 
 export const getSalaryCode = async (

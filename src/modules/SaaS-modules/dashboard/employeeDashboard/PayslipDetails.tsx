@@ -5,6 +5,7 @@ import React, { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import {
   ActivityIndicator,
+  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -18,11 +19,17 @@ import Column from '../../../../common/components/Column';
 import ContainerNew from '../../../../common/components/Container';
 import CustomDropDownNew from '../../../../common/components/CustomDropDown';
 import CustomHeader from '../../../../common/components/CustomHeader';
+import { useToast } from '../../../../common/components/CustomToast';
 import Row from '../../../../common/components/Row';
 import { IMAGES } from '../../../../common/constant/Index';
 import { COLORS } from '../../../../common/constant/Themes';
 import useAsyncEffect from '../../../../common/packages/useAsyncEffect/useAsyncEffect';
-import { getEmployeeSalaryPayslipHtml } from '../../../../services/SaaS-modules/dashboard/employeeDashboard';
+import { SalaryCodeDataType } from '../../../../interfaces/dashboard/employeeDashboard';
+import {
+  downloadEmployeeSalaryPayslipPdf,
+  getEmployeeSalaryPayslipHtml,
+  getSalaryCode,
+} from '../../../../services/SaaS-modules/dashboard/employeeDashboard';
 import { useRootStore } from '../../../../stores/rootStore';
 
 const edges: Edge[] = ['right', 'bottom', 'left'];
@@ -76,6 +83,7 @@ const PayslipDetails = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { userInfo } = useRootStore();
+  const toaster = useToast();
 
   const routeEmpId = (route.params as PayslipRouteParams)?.empId;
   const empId = routeEmpId || userInfo?.intEmployeeId;
@@ -103,6 +111,7 @@ const PayslipDetails = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [payslipHtml, setPayslipHtml] = useState('');
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useAsyncEffect(
     async isMounted => {
@@ -125,8 +134,7 @@ const PayslipDetails = () => {
     [empId, month?.value, year?.value],
   );
 
-  const isEarliest =
-    year?.value === yearDDL[0]?.value && month?.value === 1;
+  const isEarliest = year?.value === yearDDL[0]?.value && month?.value === 1;
   const isLatest =
     year?.value > currentYear ||
     (year?.value === currentYear && month?.value >= currentMonthNumber);
@@ -155,6 +163,54 @@ const PayslipDetails = () => {
     }
   };
 
+  const downloadPayslip = async () => {
+    if (!empId || !month?.value || !year?.value || isDownloading) {
+      return;
+    }
+    setIsDownloading(true);
+    try {
+      // The PDF endpoint needs the salary run id; the payroll-period DDL for
+      // the selected month gives it (first entry is the active run).
+      const salaryCodes = await getSalaryCode(
+        userInfo?.intAccountId,
+        userInfo?.intBusinessUnitId,
+        userInfo?.intWorkplaceGroupId,
+        empId,
+        month.value,
+        year.value,
+      );
+      const requestId = Array.isArray(salaryCodes)
+        ? (salaryCodes as SalaryCodeDataType[])[0]?.SalaryGenerateRequestId
+        : undefined;
+      if (!requestId) {
+        toaster.show({
+          message: 'No payslip available to download for this month',
+          type: 'warning',
+        });
+        return;
+      }
+      await downloadEmployeeSalaryPayslipPdf(
+        empId,
+        month.value,
+        year.value,
+        requestId,
+      );
+      if (Platform.OS === 'android') {
+        toaster.show({
+          message: 'Payslip downloaded to Downloads folder',
+          type: 'success',
+        });
+      }
+    } catch {
+      toaster.show({
+        message: 'Payslip download failed. Please try again',
+        type: 'error',
+      });
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   // Relative assets (e.g. logo) in the report resolve against the API origin.
   const baseUrl = useMemo(() => {
     const match = /^(https?:\/\/[^/]+)/i.exec(axios.defaults.baseURL || '');
@@ -176,6 +232,31 @@ const PayslipDetails = () => {
           headerColor={true}
           onBackPress={navigation?.goBack}
           title="Pay Slip"
+          components={
+            isDownloading ? (
+              <ActivityIndicator
+                size="small"
+                color={COLORS.onAppBar}
+                style={styles.downloadBtn}
+              />
+            ) : (
+              <TouchableOpacity
+                activeOpacity={0.7}
+                disabled={!document || isLoading}
+                onPress={downloadPayslip}
+                style={[
+                  styles.downloadBtn,
+                  (!document || isLoading) && styles.navBtnDisabled,
+                ]}
+              >
+                <MIcons
+                  name="file-download"
+                  size={26}
+                  color={COLORS.onAppBar}
+                />
+              </TouchableOpacity>
+            )
+          }
         />
       }
       style={styles.container}
@@ -219,11 +300,7 @@ const PayslipDetails = () => {
           onPress={nextMonth}
           style={[styles.navBtn, isLatest && styles.navBtnDisabled]}
         >
-          <MIcons
-            name="arrow-forward-ios"
-            size={18}
-            color={COLORS.iconColor}
-          />
+          <MIcons name="arrow-forward-ios" size={18} color={COLORS.iconColor} />
         </TouchableOpacity>
       </View>
 
@@ -288,6 +365,10 @@ const styles = StyleSheet.create({
   },
   navBtnDisabled: {
     opacity: 0.3,
+  },
+  downloadBtn: {
+    padding: 4,
+    marginRight: 10,
   },
   monthLabel: {
     fontSize: 14,
